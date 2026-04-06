@@ -3,7 +3,7 @@ const products = [
   {
     id: 9,
     name: 'Kotthapalli Kobbari Pacchadi Kayalu',
-    emoji: '🥭',
+    image: 'images/kotthapalli.jpg',
     origin: 'Kotthapalli, Andhra Pradesh',
     desc: 'A rare local variety known for its unique coconut-chutney flavour profile. Prized in Andhra households.',
     price: 399,
@@ -13,7 +13,7 @@ const products = [
   {
     id: 10,
     name: 'Banginpalli',
-    emoji: '🥭',
+    image: 'images/banginpalli.jpg',
     origin: 'Banganapalle, Andhra Pradesh',
     desc: 'GI-tagged variety with a golden-yellow skin, fibreless pulp, and a mild sweet taste. Perfect for eating fresh.',
     price: 299,
@@ -23,7 +23,7 @@ const products = [
   {
     id: 11,
     name: 'Panduru Mamidi Rasalu',
-    emoji: '🥭',
+    image: 'images/rasalu.jpg',
     origin: 'Andhra Pradesh',
     desc: 'Juicy and aromatic with a distinctly sweet, sherbet-like flavour. Best enjoyed chilled straight from the fruit.',
     price: 449,
@@ -33,7 +33,7 @@ const products = [
   {
     id: 12,
     name: 'Chilakamukku Kayalu',
-    emoji: '🥭',
+    image: 'images/chilakamukku.jpg',
     origin: 'Andhra Pradesh',
     desc: 'Named for its parrot-beak shape, this variety has a firm texture and a balanced sweet-tangy taste.',
     price: 349,
@@ -79,7 +79,7 @@ function renderProductCard(product) {
   return `
     <div class="product-card">
       <div class="product-img">
-        <span style="font-size:5rem;">${product.emoji}</span>
+        <img src="${product.image}" alt="${product.name}">
         ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
       </div>
       <div class="product-body">

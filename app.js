@@ -8,7 +8,7 @@ const products = [
     desc: 'A rare local variety known for its unique coconut-chutney flavour profile. Prized in Andhra households.',
     price: 399,
     size: '1 kg box',
-    badge: 'Local Special',
+    badge: null,
   },
   {
     id: 10,
@@ -18,7 +18,7 @@ const products = [
     desc: 'GI-tagged variety with a golden-yellow skin, fibreless pulp, and a mild sweet taste. Perfect for eating fresh.',
     price: 299,
     size: '1 kg box',
-    badge: 'GI Tagged',
+    badge: null,
   },
   {
     id: 11,
@@ -28,7 +28,7 @@ const products = [
     desc: 'Juicy and aromatic with a distinctly sweet, sherbet-like flavour. Best enjoyed chilled straight from the fruit.',
     price: 449,
     size: '1 kg box',
-    badge: 'Farm Favourite',
+    badge: null,
   },
   {
     id: 12,

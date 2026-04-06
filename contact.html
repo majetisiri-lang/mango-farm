@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us - Mango Farm</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span>🥭</span> Mango Farm</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
+      🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+    <a href="shop.html" class="btn btn-primary">Order Now</a>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>📞 Contact Us</h1>
+  <p>We'd love to hear from you. Get in touch and we'll respond as soon as possible.</p>
+</div>
+
+<!-- CONTACT LAYOUT -->
+<div class="contact-layout">
+
+  <!-- LEFT: CONTACT INFO -->
+  <div class="contact-info">
+    <h2>Get in Touch</h2>
+    <p>Whether you have a question about our mangoes, need help with an order, or want to discuss bulk purchases — our team is ready to help!</p>
+
+    <div class="contact-details">
+      <div class="contact-detail">
+        <div class="contact-detail-icon">📍</div>
+        <div class="contact-detail-info">
+          <h4>Farm Address</h4>
+          <p>123 Orchard Lane, Ratnagiri District,<br>Maharashtra, India – 415612</p>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">📞</div>
+        <div class="contact-detail-info">
+          <h4>Phone / WhatsApp</h4>
+          <p>+91 98765 43210</p>
+          <p style="font-size:.8rem;color:#aaa;">Mon–Sat, 8am–6pm IST</p>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">✉️</div>
+        <div class="contact-detail-info">
+          <h4>Email</h4>
+          <p>hello@mangofarm.in</p>
+          <p style="font-size:.8rem;color:#aaa;">We reply within 24 hours</p>
+        </div>
+      </div>
+      <div class="contact-detail">
+        <div class="contact-detail-icon">🕐</div>
+        <div class="contact-detail-info">
+          <h4>Business Hours</h4>
+          <p>Monday – Saturday: 8:00 AM – 6:00 PM<br>Sunday: Closed</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP PLACEHOLDER -->
+    <div class="map-placeholder">
+      <span>🗺️</span>
+      <span>Ratnagiri, Maharashtra</span>
+    </div>
+
+    <!-- SOCIAL -->
+    <div style="margin-top:28px;">
+      <p style="font-weight:700; margin-bottom:12px; font-size:.95rem;">Follow Us</p>
+      <div class="social-links">
+        <a class="social-link" href="#" title="Facebook">📘</a>
+        <a class="social-link" href="#" title="Instagram">📸</a>
+        <a class="social-link" href="#" title="WhatsApp">💬</a>
+        <a class="social-link" href="#" title="YouTube">▶️</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: CONTACT FORM -->
+  <div class="contact-form-card">
+    <h3>Send Us a Message</h3>
+
+    <div class="success-msg" id="contact-success">
+      ✅ Message sent! We'll get back to you within 24 hours. Thank you!
+    </div>
+
+    <form id="contact-form" onsubmit="submitContact(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name *</label>
+          <input type="text" id="c-fname" placeholder="Raj" required>
+        </div>
+        <div class="form-group">
+          <label>Last Name *</label>
+          <input type="text" id="c-lname" placeholder="Sharma" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email *</label>
+        <input type="email" id="c-email" placeholder="raj@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="c-phone" placeholder="+91 00000 00000">
+      </div>
+      <div class="form-group">
+        <label>Subject *</label>
+        <select id="c-subject" required>
+          <option value="">Select a topic...</option>
+          <option value="order">Order Enquiry</option>
+          <option value="bulk">Bulk Purchase</option>
+          <option value="delivery">Delivery Question</option>
+          <option value="quality">Product Quality</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message *</label>
+        <textarea id="c-message" rows="5" placeholder="Tell us how we can help you..." required style="resize:vertical;"></textarea>
+      </div>
+      <button type="submit" class="btn btn-green" style="width:100%;padding:14px;font-size:1rem;">
+        Send Message &nbsp;→
+      </button>
+      <p class="secure-note" style="margin-top:12px;">🔒 Your information is safe with us. We never share your data.</p>
+    </form>
+  </div>
+
+</div>
+
+<!-- FAQ SECTION -->
+<section class="section bg-light">
+  <h2 class="section-title">Frequently Asked Questions</h2>
+  <p class="section-sub">Quick answers to common questions.</p>
+  <div style="max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:16px;">
+    <details style="background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <summary style="font-weight:700;cursor:pointer;font-size:.95rem;">When are the mangoes in season?</summary>
+      <p style="margin-top:12px;color:#666;font-size:.9rem;line-height:1.7;">Our mango season typically runs from March to July. Alphonso mangoes peak in April–May, while Kesar and Dasheri are available through June–July.</p>
+    </details>
+    <details style="background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <summary style="font-weight:700;cursor:pointer;font-size:.95rem;">Do you offer bulk or wholesale pricing?</summary>
+      <p style="margin-top:12px;color:#666;font-size:.9rem;line-height:1.7;">Yes! We offer special pricing for orders above 50kg. Please use the contact form above and select "Bulk Purchase" as the subject, and we'll reach out with a custom quote.</p>
+    </details>
+    <details style="background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <summary style="font-weight:700;cursor:pointer;font-size:.95rem;">How long does delivery take?</summary>
+      <p style="margin-top:12px;color:#666;font-size:.9rem;line-height:1.7;">Standard delivery takes 2–4 business days. Express delivery (1–2 days) is available at checkout for an additional charge. We ship pan-India.</p>
+    </details>
+    <details style="background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <summary style="font-weight:700;cursor:pointer;font-size:.95rem;">What if my mangoes arrive damaged?</summary>
+      <p style="margin-top:12px;color:#666;font-size:.9rem;line-height:1.7;">We stand behind our quality. If your order arrives damaged or unsatisfactory, please contact us within 24 hours with photos and we will arrange a replacement or full refund.</p>
+    </details>
+    <details style="background:#fff;border-radius:12px;padding:20px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);">
+      <summary style="font-weight:700;cursor:pointer;font-size:.95rem;">Are your mangoes organic / pesticide-free?</summary>
+      <p style="margin-top:12px;color:#666;font-size:.9rem;line-height:1.7;">We follow natural farming practices and avoid synthetic pesticides. Our Alphonso and Kesar mangoes are certified under India's Organic Certification Scheme (NPOP).</p>
+    </details>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand"><span>🥭</span> Mango Farm</div>
+      <p class="footer-desc">Family-owned farm delivering the finest mangoes since 1994.</p>
+      <div class="social-links">
+        <a class="social-link" href="#" title="Facebook">📘</a>
+        <a class="social-link" href="#" title="Instagram">📸</a>
+        <a class="social-link" href="#" title="WhatsApp">💬</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a href="shop.html">All Varieties</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="index.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">FAQ</a>
+      <a href="#">Shipping</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Mango Farm. All rights reserved.</p>
+    <div class="payment-icons">
+      <span class="payment-icon">VISA</span>
+      <span class="payment-icon">MC</span>
+      <span class="payment-icon">PayPal</span>
+      <span class="payment-icon">UPI</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+<script>
+  function submitContact(e) {
+    e.preventDefault();
+    // In production, send to your backend / email service here
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('contact-success').classList.add('show');
+    showToast('Message sent! We\'ll reply soon.');
+  }
+
+  updateCartCount();
+</script>
+</body>
+</html>

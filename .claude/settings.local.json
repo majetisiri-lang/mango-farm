@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git --version)",
+      "Bash(gh --version)",
+      "Bash(vercel --version)",
+      "Bash(npx vercel:*)",
+      "Bash(xcode-select --install)",
+      "Bash(echo \"exit: $?\")"
+    ]
+  }
+}

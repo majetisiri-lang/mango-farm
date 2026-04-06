@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop - Mango Farm</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span>🥭</span> Mango Farm</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html" class="active">Shop</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
+      🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>🛍️ Shop All Mangoes</h1>
+  <p>Hand-picked from our farm. Choose your favourite variety and quantity.</p>
+</div>
+
+<!-- SHOP LAYOUT -->
+<div class="shop-layout">
+  <!-- SIDEBAR FILTERS -->
+  <aside class="filters">
+    <div class="filter-title">🔍 Filters</div>
+
+    <div class="filter-group">
+      <label>Variety</label>
+      <div class="filter-option"><input type="checkbox" checked id="f-all" onchange="filterProducts()"><span>All</span></div>
+      <div class="filter-option"><input type="checkbox" id="f-alphonso" onchange="filterProducts()"><span>Alphonso</span></div>
+      <div class="filter-option"><input type="checkbox" id="f-kesar" onchange="filterProducts()"><span>Kesar</span></div>
+      <div class="filter-option"><input type="checkbox" id="f-dasheri" onchange="filterProducts()"><span>Dasheri</span></div>
+      <div class="filter-option"><input type="checkbox" id="f-langra" onchange="filterProducts()"><span>Langra</span></div>
+    </div>
+
+    <div class="filter-group">
+      <label>Max Price (per kg)</label>
+      <div class="price-range">
+        <input type="range" min="5" max="50" value="50" id="price-range" oninput="updatePriceLabel(this.value); filterProducts()">
+        <div class="range-labels"><span>$5</span><span id="price-label">$50</span></div>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <label>Size</label>
+      <div class="filter-option"><input type="checkbox" id="f-1kg" onchange="filterProducts()"><span>1 kg box</span></div>
+      <div class="filter-option"><input type="checkbox" id="f-5kg" onchange="filterProducts()"><span>5 kg box</span></div>
+      <div class="filter-option"><input type="checkbox" id="f-10kg" onchange="filterProducts()"><span>10 kg box</span></div>
+    </div>
+
+    <button class="btn btn-outline" onclick="resetFilters()" style="width:100%">Reset Filters</button>
+  </aside>
+
+  <!-- PRODUCTS -->
+  <div>
+    <div class="shop-toolbar">
+      <p class="results-count" id="results-count">Showing all 8 products</p>
+      <select class="sort-select" onchange="sortProducts(this.value)">
+        <option value="default">Sort: Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="name">Name: A–Z</option>
+      </select>
+    </div>
+    <div class="products-grid" id="shop-products"></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand"><span>🥭</span> Mango Farm</div>
+      <p class="footer-desc">Family-owned farm delivering the finest mangoes since 1994.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a href="shop.html">All Varieties</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="index.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="#">FAQ</a>
+      <a href="#">Shipping</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Mango Farm. All rights reserved.</p>
+    <div class="payment-icons">
+      <span class="payment-icon">VISA</span>
+      <span class="payment-icon">MC</span>
+      <span class="payment-icon">PayPal</span>
+      <span class="payment-icon">UPI</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+<script>
+  let displayedProducts = [...products];
+
+  function renderShop() {
+    const grid = document.getElementById('shop-products');
+    grid.innerHTML = displayedProducts.map(renderProductCard).join('');
+    document.getElementById('results-count').textContent =
+      `Showing ${displayedProducts.length} of ${products.length} products`;
+  }
+
+  function filterProducts() {
+    const maxPrice = parseFloat(document.getElementById('price-range').value);
+    displayedProducts = products.filter(p => p.price <= maxPrice);
+    renderShop();
+  }
+
+  function sortProducts(val) {
+    if (val === 'price-asc') displayedProducts.sort((a,b) => a.price - b.price);
+    else if (val === 'price-desc') displayedProducts.sort((a,b) => b.price - a.price);
+    else if (val === 'name') displayedProducts.sort((a,b) => a.name.localeCompare(b.name));
+    else displayedProducts = [...products];
+    renderShop();
+  }
+
+  function updatePriceLabel(val) {
+    document.getElementById('price-label').textContent = `$${val}`;
+  }
+
+  function resetFilters() {
+    document.getElementById('price-range').value = 50;
+    updatePriceLabel(50);
+    displayedProducts = [...products];
+    renderShop();
+  }
+
+  renderShop();
+  updateCartCount();
+</script>
+</body>
+</html>

@@ -193,7 +193,7 @@
 <script>
   // Render 4 featured products on home page
   document.getElementById('home-products').innerHTML =
-    products.slice(0, 8).map(renderProductCard).join('');
+    products.map(renderProductCard).join('');
   updateCartCount();
 </script>
 </body>

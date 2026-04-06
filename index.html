@@ -21,6 +21,7 @@
       🛒 <span class="cart-count" id="nav-cart-count">0</span>
     </button>
     <a href="shop.html" class="btn btn-primary">Order Now</a>
+
   </div>
 </nav>
 
@@ -32,11 +33,6 @@
     <div class="hero-actions">
       <a href="shop.html" class="btn btn-primary btn-lg">Shop Mangoes</a>
       <a href="contact.html" class="btn btn-outline btn-lg">Contact Us</a>
-    </div>
-    <div class="hero-badges">
-      <div class="badge">🌿 100% Organic</div>
-      <div class="badge">🚚 Free Delivery over $50</div>
-      <div class="badge">⭐ 4.9 Rated</div>
     </div>
   </div>
   <div class="hero-img">
@@ -197,7 +193,7 @@
 <script>
   // Render 4 featured products on home page
   document.getElementById('home-products').innerHTML =
-    products.slice(0, 4).map(renderProductCard).join('');
+    products.slice(0, 8).map(renderProductCard).join('');
   updateCartCount();
 </script>
 </body>

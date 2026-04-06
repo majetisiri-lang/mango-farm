@@ -47,8 +47,8 @@
     <div class="filter-group">
       <label>Max Price (per kg)</label>
       <div class="price-range">
-        <input type="range" min="5" max="50" value="50" id="price-range" oninput="updatePriceLabel(this.value); filterProducts()">
-        <div class="range-labels"><span>$5</span><span id="price-label">$50</span></div>
+        <input type="range" min="100" max="2500" value="2500" id="price-range" oninput="updatePriceLabel(this.value); filterProducts()">
+        <div class="range-labels"><span>₹100</span><span id="price-label">₹2500</span></div>
       </div>
     </div>
 
@@ -138,12 +138,12 @@
   }
 
   function updatePriceLabel(val) {
-    document.getElementById('price-label').textContent = `$${val}`;
+    document.getElementById('price-label').textContent = `₹${val}`;
   }
 
   function resetFilters() {
-    document.getElementById('price-range').value = 50;
-    updatePriceLabel(50);
+    document.getElementById('price-range').value = 2500;
+    updatePriceLabel(2500);
     displayedProducts = [...products];
     renderShop();
   }

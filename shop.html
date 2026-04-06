@@ -36,27 +36,17 @@
     <div class="filter-title">🔍 Filters</div>
 
     <div class="filter-group">
-      <label>Variety</label>
-      <div class="filter-option"><input type="checkbox" checked id="f-all" onchange="filterProducts()"><span>All</span></div>
-      <div class="filter-option"><input type="checkbox" id="f-alphonso" onchange="filterProducts()"><span>Alphonso</span></div>
-      <div class="filter-option"><input type="checkbox" id="f-kesar" onchange="filterProducts()"><span>Kesar</span></div>
-      <div class="filter-option"><input type="checkbox" id="f-dasheri" onchange="filterProducts()"><span>Dasheri</span></div>
-      <div class="filter-option"><input type="checkbox" id="f-langra" onchange="filterProducts()"><span>Langra</span></div>
+      <label>Search</label>
+      <input type="text" id="f-search" placeholder="Search varieties..." oninput="filterProducts()"
+        style="width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:8px 10px;font-size:.9rem;font-family:inherit;">
     </div>
 
     <div class="filter-group">
       <label>Max Price (per kg)</label>
       <div class="price-range">
-        <input type="range" min="100" max="2500" value="2500" id="price-range" oninput="updatePriceLabel(this.value); filterProducts()">
-        <div class="range-labels"><span>₹100</span><span id="price-label">₹2500</span></div>
+        <input type="range" min="100" max="500" value="500" id="price-range" oninput="updatePriceLabel(this.value); filterProducts()">
+        <div class="range-labels"><span>₹100</span><span id="price-label">₹500</span></div>
       </div>
-    </div>
-
-    <div class="filter-group">
-      <label>Size</label>
-      <div class="filter-option"><input type="checkbox" id="f-1kg" onchange="filterProducts()"><span>1 kg box</span></div>
-      <div class="filter-option"><input type="checkbox" id="f-5kg" onchange="filterProducts()"><span>5 kg box</span></div>
-      <div class="filter-option"><input type="checkbox" id="f-10kg" onchange="filterProducts()"><span>10 kg box</span></div>
     </div>
 
     <button class="btn btn-outline" onclick="resetFilters()" style="width:100%">Reset Filters</button>
@@ -125,7 +115,11 @@
 
   function filterProducts() {
     const maxPrice = parseFloat(document.getElementById('price-range').value);
-    displayedProducts = products.filter(p => p.price <= maxPrice);
+    const search = document.getElementById('f-search').value.toLowerCase();
+    displayedProducts = products.filter(p =>
+      p.price <= maxPrice &&
+      (!search || p.name.toLowerCase().includes(search))
+    );
     renderShop();
   }
 
@@ -142,8 +136,9 @@
   }
 
   function resetFilters() {
-    document.getElementById('price-range').value = 2500;
-    updatePriceLabel(2500);
+    document.getElementById('price-range').value = 500;
+    updatePriceLabel(500);
+    document.getElementById('f-search').value = '';
     displayedProducts = [...products];
     renderShop();
   }

@@ -58,7 +58,8 @@
         ⚠️ Minimum order is <strong>10 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
       </div>
       <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
-      <div class="summary-row"><span>Delivery</span><span id="sum-delivery">₹99</span></div>
+      <div class="summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
+      <div class="summary-row"><span id="express-label" style="display:none;">Express</span><span id="sum-express" style="display:none;"></span></div>
       <div class="summary-row"><span>Tax (5% GST)</span><span id="sum-tax">₹0</span></div>
       <div class="summary-row total"><span>Total</span><span id="sum-total">₹0</span></div>
 
@@ -88,6 +89,20 @@
         <label>Phone</label>
         <input type="tel" id="ship-phone" placeholder="+91 00000 00000">
       </div>
+      <div class="form-group">
+        <label>Shipping Zone</label>
+        <select id="ship-zone" onchange="updateSummary()">
+          <option value="">Select your zone...</option>
+          <option value="ap">Andhra Pradesh — ₹100 base (1–2 days)</option>
+          <option value="south">South India (TN, KA, TG, KL) — ₹150 base (2–3 days)</option>
+          <option value="india">Rest of India — ₹240 base (3–5 days)</option>
+        </select>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+        <input type="checkbox" id="express-shipping" onchange="updateSummary()" style="width:18px;height:18px;accent-color:var(--green);flex-shrink:0;">
+        <label for="express-shipping" style="font-size:.9rem;cursor:pointer;margin:0;">Add Express Shipping <span style="color:var(--green);font-weight:700;">+₹125</span></label>
+      </div>
+      <div id="shipping-breakdown" style="background:#f9f5eb;border-radius:8px;padding:10px 14px;font-size:.82rem;color:#666;margin-bottom:4px;display:none;"></div>
 
       <hr class="divider">
 
@@ -246,6 +261,19 @@
     updateSummary();
   }
 
+  const SHIPPING_ZONES = {
+    ap:    { base: 100, extra: 40, label: 'Andhra Pradesh',  days: '1–2 days' },
+    south: { base: 150, extra: 40, label: 'South India',     days: '2–3 days' },
+    india: { base: 240, extra: 50, label: 'Rest of India',   days: '3–5 days' },
+  };
+
+  function calcShipping(zone, totalKg) {
+    if (!zone) return 0;
+    const z = SHIPPING_ZONES[zone];
+    const extraKg = Math.max(0, totalKg - 10);
+    return z.base + extraKg * z.extra;
+  }
+
   function updateSummary() {
     const cart = getCart();
     const totalKg = getTotalKg(cart);
@@ -253,14 +281,38 @@
       const p = products.find(p => p.id === item.id);
       return sum + (p ? p.price * item.qty : 0);
     }, 0);
-    const delivery = subtotal >= 1500 ? 0 : 99;
+
+    const zone = document.getElementById('ship-zone').value;
+    const express = document.getElementById('express-shipping').checked;
+    const shipping = calcShipping(zone, totalKg);
+    const expressCharge = express ? 125 : 0;
     const tax = Math.round(subtotal * 0.05);
-    const total = subtotal + delivery + tax;
+    const total = subtotal + shipping + expressCharge + tax;
 
     document.getElementById('sum-subtotal').textContent = `₹${subtotal}`;
-    document.getElementById('sum-delivery').textContent = delivery === 0 ? 'FREE' : `₹${delivery}`;
+    document.getElementById('sum-delivery').textContent = zone ? `₹${shipping}` : '— select zone';
+
+    const expressLabel = document.getElementById('express-label');
+    const expressEl = document.getElementById('sum-express');
+    if (express) {
+      expressLabel.style.display = ''; expressEl.style.display = '';
+      expressEl.textContent = `₹125`;
+    } else {
+      expressLabel.style.display = 'none'; expressEl.style.display = 'none';
+    }
+
     document.getElementById('sum-tax').textContent = `₹${tax}`;
-    document.getElementById('sum-total').textContent = `₹${total}`;
+    document.getElementById('sum-total').textContent = zone ? `₹${total}` : '—';
+
+    const breakdown = document.getElementById('shipping-breakdown');
+    if (zone) {
+      const z = SHIPPING_ZONES[zone];
+      const extraKg = Math.max(0, totalKg - 10);
+      breakdown.style.display = 'block';
+      breakdown.innerHTML = `🚚 ${z.label} · ${z.days}<br>Base ₹${z.base} for 10 kg${extraKg > 0 ? ` + ₹${extraKg * z.extra} for ${extraKg} extra kg` : ''}`;
+    } else {
+      breakdown.style.display = 'none';
+    }
 
     const warning = document.getElementById('min-order-warning');
     const checkoutBtn = document.querySelector('.checkout-btn');
@@ -323,10 +375,9 @@
 
     const name = document.getElementById('ship-name').value.trim();
     const address = document.getElementById('ship-address').value.trim();
-    if (!name || !address) {
-      showToast('Please fill in your delivery address');
-      return;
-    }
+    const zone = document.getElementById('ship-zone').value;
+    if (!name || !address) { showToast('Please fill in your delivery address'); return; }
+    if (!zone) { showToast('Please select a shipping zone'); return; }
 
     // Simulate placing order
     const orderNum = 'MF-' + Math.random().toString(36).substring(2,8).toUpperCase();

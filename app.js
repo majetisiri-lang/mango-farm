@@ -51,6 +51,12 @@ function saveCart(cart) {
   localStorage.setItem('mf_cart', JSON.stringify(cart));
 }
 
+const MIN_KG = 10;
+
+function getTotalKg(cart) {
+  return cart.reduce((sum, i) => sum + i.qty, 0);
+}
+
 function addToCart(productId) {
   const cart = getCart();
   const existing = cart.find(i => i.id === productId);

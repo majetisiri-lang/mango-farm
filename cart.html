@@ -54,6 +54,9 @@
   <div>
     <div class="order-summary" id="order-summary-panel">
       <h3>Order Summary</h3>
+      <div id="min-order-warning" style="display:none; background:#fff3e0; border:1px solid #ffb74d; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:.85rem; color:#e65100;">
+        ⚠️ Minimum order is <strong>10 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
+      </div>
       <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
       <div class="summary-row"><span>Delivery</span><span id="sum-delivery">₹99</span></div>
       <div class="summary-row"><span>Tax (5% GST)</span><span id="sum-tax">₹0</span></div>
@@ -245,6 +248,7 @@
 
   function updateSummary() {
     const cart = getCart();
+    const totalKg = getTotalKg(cart);
     const subtotal = cart.reduce((sum, item) => {
       const p = products.find(p => p.id === item.id);
       return sum + (p ? p.price * item.qty : 0);
@@ -257,6 +261,21 @@
     document.getElementById('sum-delivery').textContent = delivery === 0 ? 'FREE' : `₹${delivery}`;
     document.getElementById('sum-tax').textContent = `₹${tax}`;
     document.getElementById('sum-total').textContent = `₹${total}`;
+
+    const warning = document.getElementById('min-order-warning');
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    if (totalKg < MIN_KG) {
+      warning.style.display = 'block';
+      document.getElementById('current-kg').textContent = `${totalKg} kg`;
+      checkoutBtn.disabled = true;
+      checkoutBtn.style.opacity = '0.5';
+      checkoutBtn.style.cursor = 'not-allowed';
+    } else {
+      warning.style.display = 'none';
+      checkoutBtn.disabled = false;
+      checkoutBtn.style.opacity = '1';
+      checkoutBtn.style.cursor = 'pointer';
+    }
   }
 
   function changeQty(id, delta) {
@@ -300,6 +319,7 @@
   function placeOrder() {
     const cart = getCart();
     if (cart.length === 0) { showToast('Your cart is empty!'); return; }
+    if (getTotalKg(cart) < MIN_KG) { showToast('Minimum order is 10 kg!'); return; }
 
     const name = document.getElementById('ship-name').value.trim();
     const address = document.getElementById('ship-address').value.trim();

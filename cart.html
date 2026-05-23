@@ -181,28 +181,12 @@
           </div>
         </label>
 
-        <label class="payment-option" id="opt-cod">
-          <input type="radio" name="payment" value="cod" onchange="selectPayment('cod')">
-          <div class="payment-option-icon">💵</div>
-          <div class="payment-option-label">
-            <div class="payment-option-name">Cash on Delivery</div>
-            <div class="payment-option-desc">Pay when you receive</div>
-          </div>
-        </label>
-
       </div>
 
       <!-- ONLINE PAYMENT NOTICE -->
       <div class="card-form show" id="online-form">
         <p style="font-size:.85rem;color:#555;text-align:center;">
           A secure Razorpay payment window will open. Pay by card, UPI, net banking, or wallet.
-        </p>
-      </div>
-
-      <!-- COD NOTICE -->
-      <div class="card-form" id="cod-form">
-        <p style="font-size:.85rem;color:#555;text-align:center;">
-          Pay cash when your mangoes are delivered. No extra charge.
         </p>
       </div>
 
@@ -565,7 +549,7 @@
   }
 
   function selectPayment(method) {
-    ['online', 'cod'].forEach(m => {
+    ['online'].forEach(m => {
       document.getElementById(`opt-${m}`).classList.toggle('selected', m === method);
       const form = document.getElementById(`${m}-form`);
       if (form) form.classList.toggle('show', m === method);
@@ -643,13 +627,6 @@
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     if (!phone) { showToast('Please enter your phone number'); return; }
     if (!phoneValid) { showToast('Please enter a valid 10-digit Indian mobile number'); return; }
-
-    const method = document.querySelector('input[name="payment"]:checked').value;
-
-    if (method === 'cod') {
-      showOrderSuccess(null);
-      return;
-    }
 
     // Online payment via Razorpay
     const totalRupees = getOrderTotal();

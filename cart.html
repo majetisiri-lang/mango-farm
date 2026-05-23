@@ -152,15 +152,19 @@
         <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
       </div>
       <div class="form-group">
-        <label>Shipping Zone</label>
+        <label>Delivery Method</label>
         <select id="ship-zone" onchange="updateSummary(); validateForm()">
-          <option value="">Select your zone...</option>
-          <option value="ap">Andhra Pradesh — ₹100 base (1–2 days)</option>
-          <option value="south">South India (TN, KA, TG, KL) — ₹150 base (2–3 days)</option>
-          <option value="india">Rest of India — ₹240 base (3–5 days)</option>
+          <option value="">Select delivery method...</option>
+          <option value="pickup">Pickup from Farm (Free) — Narsapur, Andhra Pradesh</option>
+          <option value="ap">DTDC — Andhra Pradesh — ₹100 base (1–2 days)</option>
+          <option value="south">DTDC — South India (TN, KA, TG, KL) — ₹150 base (2–3 days)</option>
+          <option value="india">DTDC — Rest of India — ₹240 base (3–5 days)</option>
         </select>
       </div>
-      <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+      <div id="pickup-notice" style="display:none;background:#f0faf4;border:1px solid #b2dfcb;border-radius:10px;padding:10px 14px;font-size:.85rem;color:#1a5c36;margin-bottom:4px;">
+        🏡 You've selected farm pickup. Collect your order from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge applies.
+      </div>
+      <div class="form-group" id="express-row" style="display:flex;align-items:center;gap:10px;">
         <input type="checkbox" id="express-shipping" onchange="updateSummary(); validateForm()" style="width:18px;height:18px;accent-color:var(--green);flex-shrink:0;">
         <label for="express-shipping" style="font-size:.9rem;cursor:pointer;margin:0;">Add Express Shipping <span style="color:var(--green);font-weight:700;">+₹125</span></label>
       </div>
@@ -289,13 +293,14 @@
   }
 
   const SHIPPING_ZONES = {
-    ap:    { base: 100, extra: 40, label: 'Andhra Pradesh',  days: '1–2 days' },
-    south: { base: 150, extra: 40, label: 'South India',     days: '2–3 days' },
-    india: { base: 240, extra: 50, label: 'Rest of India',   days: '3–5 days' },
+    pickup: { base: 0,   extra: 0,  label: 'Farm Pickup',    days: 'Collect in person' },
+    ap:     { base: 100, extra: 40, label: 'Andhra Pradesh', days: '1–2 days' },
+    south:  { base: 150, extra: 40, label: 'South India',    days: '2–3 days' },
+    india:  { base: 240, extra: 50, label: 'Rest of India',  days: '3–5 days' },
   };
 
   function calcShipping(zone, totalKg) {
-    if (!zone) return 0;
+    if (!zone || zone === 'pickup') return 0;
     const z = SHIPPING_ZONES[zone];
     const extraKg = Math.max(0, totalKg - 10);
     return z.base + extraKg * z.extra;
@@ -339,12 +344,17 @@
 
     document.getElementById('sum-total').textContent = zone ? `₹${total}` : '—';
 
+    const isPickup = zone === 'pickup';
+    document.getElementById('pickup-notice').style.display = isPickup ? 'block' : 'none';
+    document.getElementById('express-row').style.display = isPickup ? 'none' : 'flex';
+    if (isPickup) document.getElementById('express-shipping').checked = false;
+
     const breakdown = document.getElementById('shipping-breakdown');
-    if (zone) {
+    if (zone && !isPickup) {
       const z = SHIPPING_ZONES[zone];
       const extraKg = Math.max(0, totalKg - 10);
       breakdown.style.display = 'block';
-      breakdown.innerHTML = `🚚 ${z.label} · ${z.days}<br>Base ₹${z.base} for 10 kg${extraKg > 0 ? ` + ₹${extraKg * z.extra} for ${extraKg} extra kg` : ''}`;
+      breakdown.innerHTML = `🚚 DTDC · ${z.label} · ${z.days}<br>Base ₹${z.base} for 10 kg${extraKg > 0 ? ` + ₹${extraKg * z.extra} for ${extraKg} extra kg` : ''}`;
     } else {
       breakdown.style.display = 'none';
     }
@@ -520,6 +530,7 @@
     else if (p >= 670 && p <= 695) zone = 'south';                  // Kerala
     else zone = 'india';                                             // Rest of India
     const select = document.getElementById('ship-zone');
+    if (select.value === 'pickup') return; // don't overwrite pickup selection
     if (select.value !== zone) {
       select.value = zone;
       updateSummary();
@@ -538,9 +549,11 @@
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     const pinValid = TEST_PINS.includes(zip) || (/^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8);
     const cityNonIndian = city && (/,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase()));
+    const isPickup = zone === 'pickup';
     const phoneVerifiedOk = phoneVerified && lastVerifiedPhone === phone;
     const totalKg = getTotalKg(getCart());
-    const allValid = name && address && city && !cityNonIndian && pinValid && phoneValid && phoneVerifiedOk && state && zone && totalKg >= MIN_KG;
+    const addressValid = isPickup || (address && city && !cityNonIndian && pinValid && state);
+    const allValid = name && addressValid && phoneValid && phoneVerifiedOk && zone && totalKg >= MIN_KG;
     const btn = document.querySelector('.checkout-btn');
     if (btn) {
       btn.disabled = !allValid;
@@ -555,13 +568,15 @@
       } else {
         const hints = [];
         if (!name) hints.push('Full name is required');
-        if (!address) hints.push('Street address is required');
-        if (!city) hints.push('City is required');
-        else if (cityNonIndian) hints.push('We currently ship within India only');
-        if (!zip) hints.push('PIN code is required');
-        else if (!pinValid) hints.push('Enter a valid 6-digit Indian PIN code');
-        if (!state) hints.push('Please select a state');
-        if (!zone) hints.push('Please select a shipping zone');
+        if (!isPickup) {
+          if (!address) hints.push('Street address is required');
+          if (!city) hints.push('City is required');
+          else if (cityNonIndian) hints.push('We currently ship within India only');
+          if (!zip) hints.push('PIN code is required');
+          else if (!pinValid) hints.push('Enter a valid 6-digit Indian PIN code');
+          if (!state) hints.push('Please select a state');
+        }
+        if (!zone) hints.push('Please select a delivery method');
         if (!phone) hints.push('Phone number is required');
         else if (!phoneValid) hints.push('Enter a valid Indian mobile number');
         else if (!phoneVerifiedOk) hints.push('Please verify your phone number with OTP');
@@ -642,11 +657,13 @@
     const city = document.getElementById('ship-city').value.trim();
     const zip = document.getElementById('ship-zip').value.trim();
     if (!name) { showToast('Please enter your full name'); return; }
-    if (!address) { showToast('Please enter your street address'); return; }
-    if (!city) { showToast('Please enter your city'); return; }
-    if (!zip) { showToast('Please enter your PIN code'); return; }
-    if (!TEST_PINS.includes(zip) && !/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
-    if (!zone) { showToast('Please select a shipping zone'); return; }
+    if (!zone) { showToast('Please select a delivery method'); return; }
+    if (zone !== 'pickup') {
+      if (!address) { showToast('Please enter your street address'); return; }
+      if (!city) { showToast('Please enter your city'); return; }
+      if (!zip) { showToast('Please enter your PIN code'); return; }
+      if (!TEST_PINS.includes(zip) && !/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
+    }
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     if (!phone) { showToast('Please enter your phone number'); return; }

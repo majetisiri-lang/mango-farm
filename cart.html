@@ -404,6 +404,7 @@
   let phoneVerified = false;
   let lastVerifiedPhone = '';
   const TEST_PHONES = ['7576852052', '3108691650'];
+  const TEST_PINS = ['000000'];
 
   function isTestPhone(phone) {
     const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+1|1)/, '');
@@ -550,7 +551,7 @@
     const zone = document.getElementById('ship-zone').value;
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
-    const pinValid = /^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8;
+    const pinValid = TEST_PINS.includes(zip) || (/^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8);
     const cityNonIndian = city && (/,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase()));
     const phoneVerifiedOk = phoneVerified && lastVerifiedPhone === phone;
     const totalKg = getTotalKg(getCart());
@@ -636,7 +637,7 @@
     if (!address) { showToast('Please enter your street address'); return; }
     if (!city) { showToast('Please enter your city'); return; }
     if (!zip) { showToast('Please enter your PIN code'); return; }
-    if (!/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
+    if (!TEST_PINS.includes(zip) && !/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
     if (!zone) { showToast('Please select a shipping zone'); return; }
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);

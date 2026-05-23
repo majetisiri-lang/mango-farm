@@ -2,69 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Shop - Godavari Mangoes</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .category-section { margin-bottom: 48px; }
+    .category-heading {
+      font-size: 1.35rem; font-weight: 800; color: var(--text);
+      margin: 0 0 20px; padding-bottom: 10px;
+      border-bottom: 2px solid var(--green);
+      letter-spacing: -.02em;
+    }
+  </style>
 </head>
 <body>
 
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="shop.html" class="active">Shop</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
   <div class="nav-actions">
     <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
       🛒 <span class="cart-count" id="nav-cart-count">0</span>
     </button>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
-  <h1>🛍️ Shop All Mangoes</h1>
+  <h1 style="color:var(--green)">🛍️ Shop All Mangoes</h1>
   <p>Hand-picked from our farm. Choose your favourite variety and quantity.</p>
 </div>
 
 <!-- SHOP LAYOUT -->
-<div class="shop-layout">
-  <!-- SIDEBAR FILTERS -->
-  <aside class="filters">
-    <div class="filter-title">🔍 Filters</div>
-
-    <div class="filter-group">
-      <label>Search</label>
-      <input type="text" id="f-search" placeholder="Search varieties..." oninput="filterProducts()"
-        style="width:100%;border:1px solid #e0e0e0;border-radius:8px;padding:8px 10px;font-size:.9rem;font-family:inherit;">
-    </div>
-
-    <div class="filter-group">
-      <label>Max Price (per kg)</label>
-      <div class="price-range">
-        <input type="range" min="100" max="500" value="500" id="price-range" oninput="updatePriceLabel(this.value); filterProducts()">
-        <div class="range-labels"><span>₹100</span><span id="price-label">₹500</span></div>
-      </div>
-    </div>
-
-    <button class="btn btn-outline" onclick="resetFilters()" style="width:100%">Reset Filters</button>
-  </aside>
-
-  <!-- PRODUCTS -->
-  <div>
-    <div class="shop-toolbar">
-      <p class="results-count" id="results-count">Showing all 8 products</p>
-      <select class="sort-select" onchange="sortProducts(this.value)">
-        <option value="default">Sort: Featured</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="name">Name: A–Z</option>
-      </select>
-    </div>
-    <div class="products-grid" id="shop-products"></div>
+<div style="padding: 32px 5%;">
+  <!-- TOP TOOLBAR -->
+  <div class="shop-toolbar" style="margin-bottom: 28px; gap: 12px; flex-wrap: wrap;">
+    <input type="text" id="f-search" placeholder="🔍  Search varieties..." oninput="filterProducts()"
+      style="flex:1;min-width:200px;border:1px solid #e0e0e0;border-radius:10px;padding:9px 14px;font-size:.9rem;font-family:inherit;background:#fff;">
+    <p class="results-count" id="results-count" style="white-space:nowrap;">Showing all products</p>
+    <select class="sort-select" onchange="sortProducts(this.value)">
+      <option value="default">Sort: Featured</option>
+      <option value="price-asc">Price: Low to High</option>
+      <option value="price-desc">Price: High to Low</option>
+      <option value="name">Name: A–Z</option>
+    </select>
   </div>
+  <div id="shop-products"></div>
 </div>
 
 <!-- FOOTER -->
@@ -106,18 +113,30 @@
 <script>
   let displayedProducts = [...products];
 
+  const categories = [
+    { key: 'kotha-kayalu', label: 'Kotha Kayalu' },
+    { key: 'rasalu',       label: 'Rasalu' },
+    { key: 'pickles',      label: 'Pickles — Avakay & Magai' },
+  ];
+
   function renderShop() {
     const grid = document.getElementById('shop-products');
-    grid.innerHTML = displayedProducts.map(renderProductCard).join('');
+    const html = categories.map(cat => {
+      const catProducts = displayedProducts.filter(p => p.category === cat.key).sort((a,b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0));
+      if (!catProducts.length) return '';
+      return `<div class="category-section">
+        <h2 class="category-heading">${cat.label}</h2>
+        <div class="products-grid">${catProducts.map(renderProductCard).join('')}</div>
+      </div>`;
+    }).join('');
+    grid.innerHTML = html || '<p style="padding:40px;color:#888">No products match your search.</p>';
     document.getElementById('results-count').textContent =
       `Showing ${displayedProducts.length} of ${products.length} products`;
   }
 
   function filterProducts() {
-    const maxPrice = parseFloat(document.getElementById('price-range').value);
     const search = document.getElementById('f-search').value.toLowerCase();
     displayedProducts = products.filter(p =>
-      p.price <= maxPrice &&
       (!search || p.name.toLowerCase().includes(search))
     );
     renderShop();
@@ -131,20 +150,14 @@
     renderShop();
   }
 
-  function updatePriceLabel(val) {
-    document.getElementById('price-label').textContent = `₹${val}`;
-  }
-
   function resetFilters() {
-    document.getElementById('price-range').value = 500;
-    updatePriceLabel(500);
     document.getElementById('f-search').value = '';
     displayedProducts = [...products];
     renderShop();
   }
 
   renderShop();
-  updateCartCount();
+  updateCartCount(); initNav();
 </script>
 </body>
 </html>

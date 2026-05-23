@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Login - Godavari Mangoes</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .login-wrap {
+      min-height: calc(100vh - 64px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 5%;
+      background: linear-gradient(135deg, #f0faf4 0%, #fefdf8 60%, #fff9ed 100%);
+    }
+    .login-card {
+      background: #fff; border-radius: 20px; padding: 40px 36px;
+      box-shadow: var(--shadow-lg); width: 100%; max-width: 420px;
+      border: 1px solid var(--border);
+    }
+    .login-card h1 { font-size: 1.55rem; font-weight: 800; color: var(--text); margin-bottom: 6px; letter-spacing: -.02em; }
+    .login-card p { color: var(--text-light); font-size: .88rem; margin-bottom: 28px; line-height: 1.65; }
+    .otp-inputs { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
+    .otp-inputs input {
+      width: 46px; height: 54px; text-align: center;
+      font-size: 1.5rem; font-weight: 700;
+      border: 1.5px solid var(--border); border-radius: 12px;
+      font-family: var(--font); color: var(--text);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .otp-inputs input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(26,92,54,.1); }
+    .resend-row { text-align: center; margin-top: 12px; font-size: .84rem; color: var(--text-light); }
+    .resend-row button { background: none; border: none; color: var(--green); font-weight: 700; cursor: pointer; font-size: .84rem; }
+    .resend-row button:disabled { color: var(--text-light); cursor: default; }
+    .step { display: none; }
+    .step.active { display: block; }
+    .login-err { background: #fef2f2; color: #b91c1c; border-radius: 10px; padding: 10px 14px; font-size: .84rem; margin-bottom: 16px; display: none; border: 1px solid #fecaca; }
+    .login-err.show { display: block; }
+    .back-btn { background: none; border: none; color: var(--green); font-weight: 700; cursor: pointer; font-size: .84rem; margin-bottom: 20px; display: flex; align-items: center; gap: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
+      🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
+
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- STEP 1: Email -->
+    <div class="step active" id="step-email">
+      <div style="font-size:2.5rem;margin-bottom:12px;">🥭</div>
+      <h1>Welcome back</h1>
+      <p>Enter your email and we'll send you a one-time password.</p>
+      <div class="login-err" id="err-email"></div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <button class="btn btn-green" style="width:100%;padding:14px;font-size:1rem;margin-top:8px;" onclick="sendOtp()" id="send-btn">
+        Send OTP
+      </button>
+      <p style="text-align:center;margin-top:20px;font-size:.82rem;color:var(--text-light);">
+        No account needed — we'll create one automatically.
+      </p>
+    </div>
+
+    <!-- STEP 2: OTP -->
+    <div class="step" id="step-otp">
+      <button class="back-btn" onclick="goBack()">← Back</button>
+      <div style="font-size:2.5rem;margin-bottom:12px;">📬</div>
+      <h1>Check your email</h1>
+      <p>We sent a 6-digit OTP to <strong id="display-email"></strong>. Enter it below.</p>
+      <div class="login-err" id="err-otp"></div>
+      <div class="otp-inputs" id="otp-inputs">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="otpKey(this,0)">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="otpKey(this,1)">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="otpKey(this,2)">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="otpKey(this,3)">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="otpKey(this,4)">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" onkeyup="otpKey(this,5)">
+      </div>
+      <button class="btn btn-green" style="width:100%;padding:14px;font-size:1rem;" onclick="verifyOtp()" id="verify-btn">
+        Verify & Login
+      </button>
+      <div class="resend-row">
+        <span id="resend-text">Didn't get it? </span>
+        <button id="resend-btn" onclick="resendOtp()" disabled>Resend OTP</button>
+        <span id="resend-timer"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+<script>
+  // Redirect if already logged in
+  if (localStorage.getItem('mgf_token')) window.location.href = 'account.html';
+
+  updateCartCount(); initNav();
+
+  let resendCountdown;
+
+  function startResendTimer(sec = 30) {
+    const btn = document.getElementById('resend-btn');
+    const timer = document.getElementById('resend-timer');
+    btn.disabled = true;
+    let t = sec;
+    resendCountdown = setInterval(() => {
+      t--;
+      timer.textContent = `(${t}s)`;
+      if (t <= 0) {
+        clearInterval(resendCountdown);
+        btn.disabled = false;
+        timer.textContent = '';
+      }
+    }, 1000);
+  }
+
+  async function sendOtp() {
+    const email = document.getElementById('login-email').value.trim();
+    const err = document.getElementById('err-email');
+    if (!email || !email.includes('@')) {
+      err.textContent = 'Please enter a valid email address.'; err.classList.add('show'); return;
+    }
+    err.classList.remove('show');
+    const btn = document.getElementById('send-btn');
+    btn.disabled = true; btn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+      document.getElementById('display-email').textContent = email;
+      document.getElementById('step-email').classList.remove('active');
+      document.getElementById('step-otp').classList.add('active');
+      document.querySelector('#otp-inputs input').focus();
+      startResendTimer();
+    } catch (e) {
+      err.textContent = e.message; err.classList.add('show');
+    }
+    btn.disabled = false; btn.textContent = 'Send OTP';
+  }
+
+  async function resendOtp() {
+    const email = document.getElementById('login-email').value.trim();
+    try {
+      await fetch('/api/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      showToast('OTP resent!');
+      startResendTimer();
+    } catch (e) { showToast('Could not resend. Try again.'); }
+  }
+
+  function otpKey(el, idx) {
+    if (el.value && idx < 5) {
+      document.querySelectorAll('#otp-inputs input')[idx + 1].focus();
+    }
+    if (event.key === 'Backspace' && !el.value && idx > 0) {
+      document.querySelectorAll('#otp-inputs input')[idx - 1].focus();
+    }
+    const all = [...document.querySelectorAll('#otp-inputs input')].map(i => i.value).join('');
+    if (all.length === 6) verifyOtp();
+  }
+
+  async function verifyOtp() {
+    const email = document.getElementById('login-email').value.trim();
+    const otp = [...document.querySelectorAll('#otp-inputs input')].map(i => i.value).join('');
+    const err = document.getElementById('err-otp');
+    if (otp.length !== 6) { err.textContent = 'Please enter the full 6-digit OTP.'; err.classList.add('show'); return; }
+    err.classList.remove('show');
+    const btn = document.getElementById('verify-btn');
+    btn.disabled = true; btn.textContent = 'Verifying...';
+    try {
+      const res = await fetch('/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, otp }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Invalid OTP');
+      localStorage.setItem('mgf_token', data.token);
+      localStorage.setItem('mgf_email', data.email);
+      showToast('Logged in!');
+      setTimeout(() => window.location.href = 'account.html', 700);
+    } catch (e) {
+      err.textContent = e.message; err.classList.add('show');
+      btn.disabled = false; btn.textContent = 'Verify & Login';
+    }
+  }
+
+  function goBack() {
+    document.getElementById('step-otp').classList.remove('active');
+    document.getElementById('step-email').classList.add('active');
+    clearInterval(resendCountdown);
+  }
+</script>
+</body>
+</html>

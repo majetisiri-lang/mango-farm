@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>My Account - Godavari Mangoes</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .account-layout { max-width: 900px; margin: 0 auto; padding: 40px 5%; }
+    .account-header {
+      background: linear-gradient(135deg, #0d3320 0%, #1a5c36 100%); color: #fff;
+      border-radius: 20px; padding: 32px 36px;
+      display: flex; align-items: center; gap: 24px;
+      margin-bottom: 28px;
+    }
+    .account-avatar {
+      width: 64px; height: 64px; background: rgba(255,255,255,.15);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; flex-shrink: 0; border: 2px solid rgba(255,255,255,.2);
+    }
+    .account-email { font-size: .86rem; opacity: .72; margin-top: 4px; }
+    .account-name { font-size: 1.35rem; font-weight: 800; letter-spacing: -.02em; }
+    .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+    .stat-box {
+      background: #fff; border-radius: 14px; padding: 24px;
+      box-shadow: var(--shadow); text-align: center; border: 1px solid var(--border);
+    }
+    .stat-box .num { font-size: 1.9rem; font-weight: 800; color: var(--green); letter-spacing: -.03em; }
+    .stat-box .lbl { font-size: .8rem; color: var(--text-light); margin-top: 4px; font-weight: 500; }
+    .orders-title { font-size: 1.1rem; font-weight: 800; color: var(--text); margin-bottom: 16px; letter-spacing: -.01em; }
+    .order-card {
+      background: #fff; border-radius: 14px; padding: 20px 24px;
+      box-shadow: var(--shadow); margin-bottom: 12px; border: 1px solid var(--border);
+    }
+    .order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+    .order-num-badge { font-weight: 800; color: var(--green); font-size: .93rem; letter-spacing: -.01em; }
+    .order-date { font-size: .78rem; color: var(--text-light); }
+    .order-status { background: #f0faf4; color: var(--green); font-size: .72rem; font-weight: 700; padding: 4px 12px; border-radius: 100px; border: 1px solid #c8e6c9; }
+    .order-items { font-size: .84rem; color: var(--text-light); margin-bottom: 10px; line-height: 1.7; }
+    .order-total { font-weight: 800; font-size: .98rem; color: var(--text); }
+    .empty-orders { text-align: center; padding: 60px 20px; }
+    .empty-orders .icon { font-size: 4rem; margin-bottom: 12px; }
+    .loading-orders { text-align: center; padding: 40px; color: var(--text-light); }
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: 1fr 1fr; }
+      .account-header { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
+      🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
+
+<div class="account-layout">
+
+  <div class="account-header">
+    <div class="account-avatar">👤</div>
+    <div>
+      <div class="account-name" id="acct-name">My Account</div>
+      <div class="account-email" id="acct-email"></div>
+    </div>
+    <div style="margin-left:auto;">
+      <button class="btn" style="background:rgba(255,255,255,.2);color:#fff;" onclick="logoutUser()">Logout</button>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="num" id="stat-orders">—</div>
+      <div class="lbl">Total Orders</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="stat-spent">—</div>
+      <div class="lbl">Total Spent</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="stat-items">—</div>
+      <div class="lbl">Items Ordered</div>
+    </div>
+  </div>
+
+  <div class="orders-title">Order History</div>
+  <div id="orders-container"><div class="loading-orders">Loading your orders...</div></div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-bottom" style="border-top:none;padding-top:0;">
+    <p>&copy; 2026 Godavari Mangoes. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+<script>
+  const token = localStorage.getItem('mgf_token');
+  const email = localStorage.getItem('mgf_email');
+
+  if (!token || !email) window.location.href = 'login.html';
+
+  updateCartCount(); initNav();
+
+  document.getElementById('acct-email').textContent = email;
+  document.getElementById('acct-name').textContent = email.split('@')[0];
+
+  async function loadOrders() {
+    try {
+      const res = await fetch(`/api/get-orders?token=${token}`);
+      if (res.status === 401) { logoutUser(); return; }
+      const data = await res.json();
+      const orders = data.orders || [];
+
+      document.getElementById('stat-orders').textContent = orders.length;
+      const totalSpent = orders.reduce((s, o) => s + (o.total || 0), 0);
+      const totalItems = orders.reduce((s, o) => s + (o.items || []).reduce((a, i) => a + i.qty, 0), 0);
+      document.getElementById('stat-spent').textContent = `₹${totalSpent}`;
+      document.getElementById('stat-items').textContent = totalItems;
+
+      const container = document.getElementById('orders-container');
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="empty-orders">
+            <div class="icon">🥭</div>
+            <h3>No orders yet</h3>
+            <p style="color:var(--text-light);margin-bottom:20px;">Your order history will appear here once you place an order.</p>
+            <a href="shop.html" class="btn btn-green btn-lg">Shop Now</a>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = orders.map(o => {
+        const date = o.date ? new Date(o.date).toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' }) : '—';
+        const itemsList = (o.items || []).map(i => `${i.name} × ${i.qty} kg`).join(', ');
+        return `
+          <div class="order-card">
+            <div class="order-card-top">
+              <div>
+                <div class="order-num-badge">Order #${o.orderNum || '—'}</div>
+                <div class="order-date">${date}</div>
+              </div>
+              <span class="order-status">${o.status || 'Confirmed'}</span>
+            </div>
+            <div class="order-items">${itemsList || 'No items'}</div>
+            <div class="order-total">Total: ₹${o.total || 0}</div>
+          </div>`;
+      }).join('');
+    } catch (e) {
+      document.getElementById('orders-container').innerHTML = '<p style="color:var(--text-light);padding:20px;">Could not load orders. Please try again.</p>';
+    }
+  }
+
+  loadOrders();
+</script>
+</body>
+</html>

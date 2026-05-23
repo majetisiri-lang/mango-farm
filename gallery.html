@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Gallery - Godavari Mangoes</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .gallery-grid {
+      columns: 3; column-gap: 16px;
+      padding: 40px 5%;
+    }
+    .gallery-item {
+      break-inside: avoid; margin-bottom: 16px;
+      border-radius: var(--radius); overflow: hidden;
+      position: relative; cursor: pointer;
+    }
+    .gallery-item img {
+      width: 100%; display: block;
+      transition: transform .3s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.04); }
+    .gallery-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,.6));
+      color: #fff; padding: 24px 14px 12px;
+      font-size: .82rem; font-weight: 600;
+      opacity: 0; transition: opacity .3s;
+    }
+    .gallery-item:hover .gallery-caption { opacity: 1; }
+    /* Lightbox */
+    .lightbox {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.9); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; object-fit: contain; }
+    .lightbox-close {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none; color: #fff;
+      font-size: 2rem; cursor: pointer;
+    }
+    @media (max-width: 768px) { .gallery-grid { columns: 2; } }
+    @media (max-width: 480px) { .gallery-grid { columns: 1; } }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
+      🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Farm Gallery</h1>
+  <p>A glimpse of our farm, our trees, and our freshly harvested mangoes.</p>
+</div>
+
+<!-- GALLERY -->
+<div class="gallery-grid" id="gallery-grid">
+
+  <div class="gallery-item" onclick="openLightbox('images/banginpalli.jpg')">
+    <img src="images/banginpalli.jpg" alt="Banginpalli mangoes" loading="lazy">
+    <div class="gallery-caption">Banginpalli — golden-yellow, fibreless and sweet</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/rasalu.jpg')">
+    <img src="images/rasalu.jpg" alt="Panduru Mamidi Rasalu mangoes" loading="lazy">
+    <div class="gallery-caption">Rasalu — juicy, aromatic and sherbet-like</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/chilakamukku.jpg')">
+    <img src="images/chilakamukku.jpg" alt="Chilakamukku Kayalu mangoes" loading="lazy">
+    <div class="gallery-caption">Chilakamukku — firm, parrot-beak shaped, sweet-tangy</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/kotthapalli.jpg')">
+    <img src="images/kotthapalli.jpg" alt="Kotthapalli Kobbari Pacchadi Kayalu mangoes" loading="lazy">
+    <div class="gallery-caption">Kotthapalli — rare local variety with a unique coconut-chutney flavour</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_154331144.jpg')">
+    <img src="images/gallery/IMG_20260430_154331144.jpg" alt="Aerial view of the farm" loading="lazy">
+    <div class="gallery-caption">Our farm from above — Narsapur, Andhra Pradesh</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_154543811.jpg')">
+    <img src="images/gallery/IMG_20260430_154543811.jpg" alt="Farm aerial view" loading="lazy">
+    <div class="gallery-caption">The full orchard in season</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_113701235.jpg')">
+    <img src="images/gallery/IMG_20260430_113701235.jpg" alt="Large mango tree with bagged fruits" loading="lazy">
+    <div class="gallery-caption">A mature tree with individually bagged mangoes</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_163716213.jpg')">
+    <img src="images/gallery/IMG_20260430_163716213.jpg" alt="Old mango tree with bags" loading="lazy">
+    <div class="gallery-caption">One of our oldest trees, heavy with fruit</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_162426386.jpg')">
+    <img src="images/gallery/IMG_20260430_162426386.jpg" alt="Tree full of red bags" loading="lazy">
+    <div class="gallery-caption">Every mango individually bagged for quality</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_162501746.jpg')">
+    <img src="images/gallery/IMG_20260430_162501746.jpg" alt="Ancient mango tree" loading="lazy">
+    <div class="gallery-caption">A grand old tree — over 30 years of fruit</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_162050988.jpg')">
+    <img src="images/gallery/IMG_20260430_162050988.jpg" alt="Row of trees with bagged mangoes" loading="lazy">
+    <div class="gallery-caption">Rows of trees ready for harvest</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_162622811.jpg')">
+    <img src="images/gallery/IMG_20260430_162622811.jpg" alt="Tree with red bags" loading="lazy">
+    <div class="gallery-caption">Paper-bagging protects each mango naturally</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_163300918.jpg')">
+    <img src="images/gallery/IMG_20260430_163300918.jpg" alt="Mango tree loaded with fruit" loading="lazy">
+    <div class="gallery-caption">Mangoes hanging heavy on the branches</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_163530631.jpg')">
+    <img src="images/gallery/IMG_20260430_163530631.jpg" alt="Fully loaded mango tree" loading="lazy">
+    <div class="gallery-caption">A bumper harvest in full view</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_163540968.jpg')">
+    <img src="images/gallery/IMG_20260430_163540968.jpg" alt="Mango tree" loading="lazy">
+    <div class="gallery-caption">Sun-ripened Godavari mangoes</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_161055414.jpg')">
+    <img src="images/gallery/IMG_20260430_161055414.jpg" alt="Green mangoes hanging" loading="lazy">
+    <div class="gallery-caption">Clusters of green mangoes ripening on the branch</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_161205316.jpg')">
+    <img src="images/gallery/IMG_20260430_161205316.jpg" alt="Mangoes on low branches" loading="lazy">
+    <div class="gallery-caption">Branches bending with the weight of fruit</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_114216166.jpg')">
+    <img src="images/gallery/IMG_20260430_114216166.jpg" alt="Single large mango on tree" loading="lazy">
+    <div class="gallery-caption">A single Banginpalli ripening on the tree</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_114259760.jpg')">
+    <img src="images/gallery/IMG_20260430_114259760.jpg" alt="Mango on branch" loading="lazy">
+    <div class="gallery-caption">Farm-fresh, picked at peak ripeness</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_161320213.jpg')">
+    <img src="images/gallery/IMG_20260430_161320213.jpg" alt="Cluster of small mangoes" loading="lazy">
+    <div class="gallery-caption">Rasalu — small, round and incredibly sweet</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_160829721.jpg')">
+    <img src="images/gallery/IMG_20260430_160829721.jpg" alt="Green mangoes cluster" loading="lazy">
+    <div class="gallery-caption">Fresh off the branch — nature at its best</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_160928947.jpg')">
+    <img src="images/gallery/IMG_20260430_160928947.jpg" alt="Hand holding mangoes" loading="lazy">
+    <div class="gallery-caption">Freshly picked — you can taste the care</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_161533772.jpg')">
+    <img src="images/gallery/IMG_20260430_161533772.jpg" alt="Hand holding a mango" loading="lazy">
+    <div class="gallery-caption">Handpicked from our trees to your doorstep</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_114529068_MF_PORTRAIT.jpg')">
+    <img src="images/gallery/IMG_20260430_114529068_MF_PORTRAIT.jpg" alt="Paper bag on mango" loading="lazy">
+    <div class="gallery-caption">Each mango wrapped by hand for protection</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_113648136.jpg')">
+    <img src="images/gallery/IMG_20260430_113648136.jpg" alt="Trees with young plants" loading="lazy">
+    <div class="gallery-caption">New grafted saplings growing alongside mature trees</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_113942613.jpg')">
+    <img src="images/gallery/IMG_20260430_113942613.jpg" alt="Dense trees with bags" loading="lazy">
+    <div class="gallery-caption">Peak season in our orchard</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_113539514.jpg')">
+    <img src="images/gallery/IMG_20260430_113539514.jpg" alt="Young mango tree" loading="lazy">
+    <div class="gallery-caption">A young tree — growing for the next generation</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/IMG_20260430_160401605.jpg')">
+    <img src="images/gallery/IMG_20260430_160401605.jpg" alt="Mango seedling" loading="lazy">
+    <div class="gallery-caption">New life — a freshly planted mango seedling</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/farm-1.jpeg')">
+    <img src="images/gallery/farm-1.jpeg" alt="Fresh mango held by hand" loading="lazy">
+    <div class="gallery-caption">A prize mango — handpicked from our orchard</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/farm-2.jpeg')">
+    <img src="images/gallery/farm-2.jpeg" alt="Mango hanging on tree" loading="lazy">
+    <div class="gallery-caption">Ripening on the branch — nature taking its course</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/farm-3.jpeg')">
+    <img src="images/gallery/farm-3.jpeg" alt="Large mango with basket of small mangoes" loading="lazy">
+    <div class="gallery-caption">The big and the small — variety from our farm</div>
+  </div>
+
+  <div class="gallery-item" onclick="openLightbox('images/gallery/farm-4.jpeg')">
+    <img src="images/gallery/farm-4.jpeg" alt="Golden mango held up at the farm" loading="lazy">
+    <div class="gallery-caption">Sun-kissed and ready — straight from the tree</div>
+  </div>
+
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand"><span>🥭</span> Godavari Mangoes</div>
+      <p class="footer-desc">Family-owned farm delivering the finest mangoes directly to your door. Grown with love, shipped with care.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="shop.html">Products</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="recipes.html">Recipes</a>
+      <a href="blog.html">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="index.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="contact.html">FAQ</a>
+      <a href="contact.html">Shipping</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Godavari Mangoes. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+<script>
+  updateCartCount(); initNav();
+
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+  }
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+  }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Recipes - Godavari Mangoes</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .recipes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; padding: 40px 5%; }
+    .recipe-card {
+      background: #fff; border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow); transition: all .25s;
+      cursor: pointer; border: 1px solid var(--border);
+    }
+    .recipe-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); border-color: transparent; }
+    .recipe-img {
+      height: 180px; background: linear-gradient(135deg, #f0faf4, #fff9ed);
+      display: flex; align-items: center; justify-content: center; font-size: 5rem;
+      position: relative;
+    }
+    .recipe-img .click-hint {
+      position: absolute; bottom: 10px; right: 12px;
+      font-size: .72rem; background: rgba(0,0,0,.4); color: #fff;
+      padding: 3px 10px; border-radius: 100px; font-weight: 600;
+    }
+    .recipe-body { padding: 20px; }
+    .recipe-tag { display: inline-block; background: var(--yellow-light); color: #9a6400; font-size: .68rem; font-weight: 700; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; }
+    .recipe-title { font-size: 1.05rem; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -.01em; }
+    .recipe-desc { font-size: .84rem; color: var(--text-light); line-height: 1.6; margin-bottom: 16px; }
+    .recipe-meta { display: flex; gap: 16px; font-size: .78rem; color: var(--text-light); }
+    .recipe-meta span { display: flex; align-items: center; gap: 4px; }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); z-index: 300;
+      align-items: flex-start; justify-content: center;
+      padding: 24px 16px; overflow-y: auto;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #fff; border-radius: 20px; width: 100%; max-width: 680px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.22);
+      position: relative; margin: auto;
+    }
+    .modal-hero {
+      background: linear-gradient(135deg, #f0faf4, #fff9ed);
+      border-radius: 20px 20px 0 0; padding: 40px 0 20px;
+      text-align: center; font-size: 5rem;
+    }
+    .modal-close {
+      position: absolute; top: 14px; right: 16px;
+      background: rgba(0,0,0,.2); border: none; cursor: pointer;
+      width: 32px; height: 32px; border-radius: 50%;
+      color: #fff; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .modal-close:hover { background: rgba(0,0,0,.35); }
+    .modal-body { padding: 28px 32px 36px; }
+    .modal-tag { display: inline-block; background: var(--yellow-light); color: #9a6400; font-size: .68rem; font-weight: 700; padding: 3px 10px; border-radius: 100px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .04em; }
+    .modal-title { font-size: 1.55rem; font-weight: 800; color: var(--text); margin-bottom: 8px; letter-spacing: -.025em; }
+    .modal-meta { display: flex; gap: 20px; font-size: .82rem; color: var(--text-light); margin-bottom: 24px; flex-wrap: wrap; }
+    .modal-meta span { display: flex; align-items: center; gap: 5px; }
+    .modal-section-title {
+      font-size: .7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .1em; color: var(--text-light); margin-bottom: 12px; margin-top: 24px;
+    }
+    /* Serving adjuster */
+    .serving-row {
+      display: flex; align-items: center; gap: 14px;
+      background: #f5f5f0; border-radius: 12px; padding: 12px 16px;
+      margin-bottom: 4px;
+    }
+    .serving-label { font-size: .9rem; font-weight: 600; flex: 1; }
+    .serving-ctrl { display: flex; align-items: center; gap: 10px; }
+    .serving-btn {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: var(--green); color: #fff; border: none;
+      font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s;
+    }
+    .serving-btn:hover { background: var(--green-mid); }
+    .serving-count { font-size: 1.1rem; font-weight: 800; min-width: 28px; text-align: center; color: var(--green); }
+    /* Ingredients */
+    .ingredients-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .ingredient-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 14px; border-radius: 10px; font-size: .875rem;
+      background: var(--bg); border: 1px solid var(--border);
+    }
+    .ingredient-qty { font-weight: 700; color: var(--green); min-width: 80px; }
+    .ingredient-name { color: var(--text); flex: 1; }
+    /* Steps */
+    .steps-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .step-row { display: flex; gap: 14px; align-items: flex-start; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      font-size: .75rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+    }
+    .step-text { font-size: .875rem; color: var(--text); line-height: 1.65; padding-top: 4px; }
+    /* Fun fact */
+    .fun-fact {
+      background: #f0faf4;
+      border-left: 3px solid var(--green);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 18px; margin-top: 8px;
+    }
+    .fun-fact-label { font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--green); margin-bottom: 6px; }
+    .fun-fact p { font-size: .85rem; color: var(--text-light); line-height: 1.75; margin: 0; }
+
+    @media (max-width: 600px) {
+      .modal-body { padding: 20px 18px 28px; }
+      .modal-title { font-size: 1.3rem; }
+    }
+    /* Slideshow */
+    .recipe-slideshow { position: relative; width: 100%; height: 100%; overflow: hidden; background: #111; }
+    .recipe-slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
+    .recipe-slideshow .slide.active { opacity: 1; }
+    .slide-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      background: rgba(0,0,0,.45); color: #fff; border: none;
+      width: 30px; height: 30px; border-radius: 50%; font-size: 1.3rem;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s; z-index: 2; padding: 0; line-height: 1;
+    }
+    .recipe-img:hover .slide-btn { opacity: 1; }
+    .modal-slideshow .slide-btn { opacity: 1; }
+    .slide-prev { left: 8px; }
+    .slide-next { right: 8px; }
+    .slide-dots { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; z-index: 2; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,.45); cursor: pointer; transition: background .2s; }
+    .dot.active { background: #fff; }
+    .modal-slideshow { height: 220px; border-radius: 20px 20px 0 0; overflow: hidden; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
+      🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <h1>Mango Recipes</h1>
+  <p>Click any recipe to see ingredients, steps, and fun facts. Adjust servings and quantities update automatically.</p>
+</div>
+
+<!-- RECIPE CARDS -->
+<div class="recipes-grid" id="recipes-grid"></div>
+
+<!-- RECIPE MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="modal-hero" id="modal-hero"></div>
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-body">
+      <span class="modal-tag" id="modal-tag"></span>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-meta" id="modal-meta"></div>
+
+      <div class="modal-section-title">Servings</div>
+      <div class="serving-row">
+        <span class="serving-label" id="serving-label">Servings</span>
+        <div class="serving-ctrl">
+          <button class="serving-btn" onclick="changeServings(-1)">−</button>
+          <span class="serving-count" id="serving-count">2</span>
+          <button class="serving-btn" onclick="changeServings(1)">+</button>
+        </div>
+      </div>
+
+      <div class="modal-section-title">Ingredients</div>
+      <ul class="ingredients-list" id="ingredients-list"></ul>
+
+      <div class="modal-section-title">Steps</div>
+      <ol class="steps-list" id="steps-list"></ol>
+
+      <div class="modal-section-title">Fun Fact</div>
+      <div class="fun-fact">
+        <div class="fun-fact-label">Did you know?</div>
+        <p id="fun-fact-text"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand"><span>🥭</span> Godavari Mangoes</div>
+      <p class="footer-desc">Family-owned farm delivering the finest mangoes directly to your door. Grown with love, shipped with care.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <a href="shop.html">Products</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="recipes.html">Recipes</a>
+      <a href="blog.html">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="index.html">About</a>
+      <a href="contact.html">Contact</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a href="contact.html">FAQ</a>
+      <a href="contact.html">Shipping</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 Godavari Mangoes. All rights reserved.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+<script>
+  // ── RECIPE DATA ──────────────────────────────────────────────
+  const recipes = [
+    {
+      id: 1,
+      emoji: '🥭',
+      tag: 'Drink',
+      title: 'Mango Lassi',
+      desc: 'A creamy, refreshing blend of ripe Rasalu mangoes, thick curd, sugar, and cardamom. Best served chilled.',
+      time: '10 min',
+      difficulty: 'Easy',
+      baseServings: 2,
+      servingUnit: 'glasses',
+      ingredients: [
+        { qty: 1,    unit: 'cup',   name: 'ripe mango pulp (Rasalu or Banginpalli)' },
+        { qty: 1,    unit: 'cup',   name: 'thick curd (yogurt)' },
+        { qty: 0.5,  unit: 'cup',   name: 'cold milk' },
+        { qty: 2,    unit: 'tbsp',  name: 'sugar' },
+        { qty: 0.25, unit: 'tsp',   name: 'cardamom powder' },
+        { qty: null, unit: '',      name: 'pinch of saffron (optional)' },
+        { qty: null, unit: '',      name: 'ice cubes, to serve' },
+      ],
+      steps: [
+        'Blend mango pulp, curd, and milk together until completely smooth.',
+        'Add sugar and cardamom powder, blend again for 30 seconds.',
+        'Taste and adjust sweetness to your liking.',
+        'Pour into glasses over ice cubes.',
+        'Garnish with a pinch of saffron or a small slice of mango.',
+      ],
+      funFact: 'Lassi originated in the Punjab region of India over 1,000 years ago — originally just curd, water, and salt. The sweet mango version became popular in the 1980s and is now India\'s most-consumed yogurt-based drink. In Amritsar, lassi is traditionally served in earthen pots that keep it naturally cool.',
+      images: ['images/recipes/lassi-1.jpg','images/recipes/lassi-2.jpg','images/recipes/lassi-3.jpg'],
+    },
+    {
+      id: 2,
+      emoji: '🍨',
+      tag: 'Dessert',
+      title: 'Mango Kulfi',
+      desc: 'Rich, dense kulfi made with Banginpalli pulp, condensed milk, and cream. Set overnight for an indulgent treat.',
+      time: '20 min + freeze',
+      difficulty: 'Easy',
+      baseServings: 4,
+      servingUnit: 'kulfis',
+      ingredients: [
+        { qty: 2,   unit: 'cups', name: 'ripe mango pulp (Banginpalli)' },
+        { qty: 400, unit: 'ml',   name: 'condensed milk' },
+        { qty: 200, unit: 'ml',   name: 'heavy cream' },
+        { qty: 0.5, unit: 'tsp',  name: 'cardamom powder' },
+        { qty: 2,   unit: 'tbsp', name: 'pistachios, finely chopped' },
+        { qty: null, unit: '',    name: 'pinch of saffron (optional)' },
+      ],
+      steps: [
+        'Whisk together mango pulp and condensed milk in a large bowl until fully combined.',
+        'Fold in the heavy cream and cardamom powder gently — do not overmix.',
+        'Add saffron if using, and stir once.',
+        'Pour the mixture into kulfi moulds or small cups/glasses.',
+        'Sprinkle chopped pistachios on top of each mould.',
+        'Cover with foil and freeze for at least 6 hours, or overnight.',
+        'To serve, run the mould briefly under warm water and unmould onto a plate.',
+      ],
+      funFact: 'Kulfi predates ice cream by centuries. It was first made in the royal kitchens of the Mughal emperors in Delhi during the 16th century, using cream, reduced milk, and spices packed in sealed earthen pots buried in snow brought down from the Himalayas. Unlike ice cream, kulfi is never churned, which gives it a denser, creamier texture that melts slowly.',
+      images: ['images/recipes/kulfi-1.jpg','images/recipes/kulfi-2.webp'],
+    },
+    {
+      id: 3,
+      emoji: '🍛',
+      tag: 'Main Course',
+      title: 'Raw Mango Dal',
+      desc: 'A tangy Andhra-style toor dal cooked with raw Kotthapalli mangoes, tempered with mustard seeds and curry leaves.',
+      time: '30 min',
+      difficulty: 'Medium',
+      baseServings: 4,
+      servingUnit: 'servings',
+      ingredients: [
+        { qty: 1,    unit: 'cup',  name: 'toor dal (split pigeon peas)' },
+        { qty: 1,    unit: '',     name: 'raw mango, peeled and cubed' },
+        { qty: 2,    unit: '',     name: 'green chillies, slit' },
+        { qty: 0.5,  unit: 'tsp', name: 'turmeric powder' },
+        { qty: null, unit: '',    name: 'salt, to taste' },
+        { qty: 2,    unit: 'tbsp', name: 'oil' },
+        { qty: 1,    unit: 'tsp', name: 'mustard seeds' },
+        { qty: 0.5,  unit: 'tsp', name: 'cumin seeds' },
+        { qty: 2,    unit: '',    name: 'dried red chillies' },
+        { qty: 10,   unit: '',    name: 'curry leaves' },
+        { qty: 1,    unit: '',    name: 'medium onion, finely chopped' },
+        { qty: 3,    unit: '',    name: 'garlic cloves, minced' },
+      ],
+      steps: [
+        'Wash toor dal thoroughly. Pressure cook it with raw mango cubes, turmeric, and 2.5 cups water for 3 whistles.',
+        'Once pressure releases, mash the dal and mango together into a smooth, slightly thick consistency.',
+        'Heat oil in a heavy pan over medium heat. Add mustard seeds and wait for them to splutter.',
+        'Add cumin seeds, dried red chillies, and curry leaves — fry for 30 seconds.',
+        'Add minced garlic and chopped onion. Fry until the onion turns golden brown.',
+        'Pour in the mashed dal mixture and stir well to combine with the tempering.',
+        'Simmer on low heat for 5 minutes. Adjust salt and consistency with water if needed.',
+        'Serve hot with steamed white rice and a dollop of ghee on top.',
+      ],
+      funFact: 'Raw Mango Dal is called "Mamidikaya Pappu" in Telugu and is one of the most iconic dishes of Andhra Pradesh. Families consider it auspicious to cook this dish with the very first raw mangoes of the season — it marks the official arrival of summer. The tangy sourness of the raw mango completely replaces the need for tamarind, making it lighter and more refreshing than regular dal.',
+      images: ['images/recipes/dal-1.jpg','images/recipes/dal-2.jpg'],
+    },
+    {
+      id: 4,
+      emoji: '🫙',
+      tag: 'Pickle',
+      title: 'Mango Avakaya',
+      desc: 'The legendary Andhra raw mango pickle with mustard, red chilli, and sesame oil. A recipe passed through generations.',
+      time: '45 min + 3 days',
+      difficulty: 'Medium',
+      baseServings: 1,
+      servingUnit: 'jar (500g)',
+      ingredients: [
+        { qty: 500, unit: 'g',    name: 'raw green mango, cut into 2cm cubes' },
+        { qty: 3,   unit: 'tbsp', name: 'mustard powder (freshly ground)' },
+        { qty: 2,   unit: 'tbsp', name: 'red chilli powder' },
+        { qty: 1,   unit: 'tbsp', name: 'salt (non-iodised)' },
+        { qty: 0.5, unit: 'tsp',  name: 'fenugreek powder' },
+        { qty: 0.25,unit: 'tsp',  name: 'turmeric powder' },
+        { qty: 4,   unit: 'tbsp', name: 'sesame oil (gingelly oil)' },
+      ],
+      steps: [
+        'Wash the raw mango pieces and spread on a clean cloth. Dry completely — even a little moisture causes spoilage.',
+        'In a large bowl, combine mustard powder, red chilli, fenugreek, turmeric, and salt. Mix well.',
+        'Add the dried mango pieces and coat them thoroughly in the spice mixture.',
+        'Heat sesame oil in a small pan until it just begins to smoke. Remove from heat and let it cool completely.',
+        'Pour the cooled oil over the spiced mango and mix everything together.',
+        'Transfer to a completely dry, sterilised glass jar. Press down to remove air pockets.',
+        'Leave at room temperature for 2–3 days before eating, stirring once each day with a dry spoon.',
+        'Store in a cool, dry place. Keeps well for up to 6 months.',
+      ],
+      funFact: 'Avakaya is considered the undisputed king of Andhra pickles, with a history of over 500 years. Pickle recipes are closely guarded family secrets — it\'s said that in Andhra homes, a bride\'s avakaya recipe is as important as her dowry. The Godavari region grows a specific variety of raw mango prized for its high fibre content and tartness, which gives Godavari avakaya its distinctive bold flavour that differs from pickles made elsewhere.',
+      images: ['images/recipes/avakaya-1.webp','images/recipes/avakaya-2.webp'],
+    },
+    {
+      id: 5,
+      emoji: '🍮',
+      tag: 'Dessert',
+      title: 'Mango Shrikhand',
+      desc: 'Hung curd blended with sweet Rasalu pulp, sugar, saffron, and cardamom. A festival-season favourite.',
+      time: '15 min + chill',
+      difficulty: 'Easy',
+      baseServings: 3,
+      servingUnit: 'servings',
+      ingredients: [
+        { qty: 500, unit: 'g',    name: 'full-fat curd (or thick Greek yogurt)' },
+        { qty: 0.75,unit: 'cup',  name: 'ripe mango pulp (Rasalu or Banginpalli)' },
+        { qty: 4,   unit: 'tbsp', name: 'icing sugar (powdered)' },
+        { qty: 0.25,unit: 'tsp',  name: 'cardamom powder' },
+        { qty: 1,   unit: 'tbsp', name: 'warm milk (for saffron)' },
+        { qty: null, unit: '',    name: 'a generous pinch of saffron' },
+        { qty: 1,   unit: 'tbsp', name: 'pistachios, chopped (to garnish)' },
+      ],
+      steps: [
+        'Tie the curd in a clean muslin cloth and hang over a bowl for 4–6 hours to drain the whey. (Skip if using Greek yogurt.)',
+        'Soak saffron in 1 tbsp warm milk for 10 minutes until it releases its colour.',
+        'Beat the hung curd with a whisk until it becomes smooth and lump-free.',
+        'Add mango pulp, icing sugar, and cardamom. Mix gently to combine.',
+        'Fold in the saffron milk, swirling it for a marbled effect if desired.',
+        'Cover and refrigerate for at least 2 hours before serving.',
+        'Serve chilled in small bowls, garnished with chopped pistachios.',
+      ],
+      funFact: 'Shrikhand is one of India\'s oldest desserts, with references dating back over 500 years in Gujarati and Marathi texts. It was historically offered as "prasad" — sacred food at temples — during Janmashtami and Gudi Padwa. The mango version, called "Amrakhand", became especially popular in Maharashtra and is now a staple at Maharashtrian weddings. The word "shrikhand" comes from Sanskrit: "shri" (auspicious) and "khanda" (sugar).',
+      images: ['images/recipes/shrikhand-1.jpg','images/recipes/shrikhand-2.jpg'],
+    },
+    {
+      id: 6,
+      emoji: '🧃',
+      tag: 'Drink',
+      title: 'Aam Panna',
+      desc: 'A tangy, cooling summer cooler from raw green mangoes with roasted cumin, black salt, and fresh mint.',
+      time: '20 min',
+      difficulty: 'Easy',
+      baseServings: 4,
+      servingUnit: 'glasses',
+      ingredients: [
+        { qty: 2,   unit: '',     name: 'large raw green mangoes' },
+        { qty: 4,   unit: 'tbsp', name: 'sugar or jaggery' },
+        { qty: 1,   unit: 'tsp',  name: 'roasted cumin powder' },
+        { qty: 0.5, unit: 'tsp',  name: 'black salt (kala namak)' },
+        { qty: 0.25,unit: 'tsp',  name: 'regular salt' },
+        { qty: 10,  unit: '',     name: 'fresh mint leaves' },
+        { qty: 4,   unit: 'cups', name: 'cold water' },
+        { qty: null, unit: '',    name: 'ice cubes, to serve' },
+      ],
+      steps: [
+        'Roast the raw mangoes directly over a gas flame, turning occasionally, until the skin is charred and the inside is soft (about 10 min). Alternatively, boil them for 15 minutes.',
+        'Let the mangoes cool completely, then peel off the skin and squeeze out all the pulp into a blender.',
+        'Add sugar, roasted cumin, black salt, regular salt, and mint leaves to the blender.',
+        'Blend into a smooth concentrate.',
+        'Add cold water and blend again briefly. Taste and adjust seasoning.',
+        'Strain through a sieve to remove any fibres.',
+        'Serve immediately over ice, garnished with a sprig of mint.',
+      ],
+      funFact: 'Aam Panna is one of India\'s oldest documented summer drinks, with mentions in Mughal court records from the 16th century. Ancient Ayurvedic texts describe raw mango drinks as a powerful remedy for heat stroke, sunstroke, and dehydration — and modern science confirms this: raw mangoes are rich in Vitamin C, B6, and malic acid, which helps restore the electrolytes lost through sweating. In rural India, farm workers still drink aam panna during harvest season to stay cool.',
+      images: ['images/recipes/aampanna-1.jpg','images/recipes/aampanna-2.webp'],
+    },
+  ];
+
+  // ── HELPERS ──────────────────────────────────────────────────
+  function fmtQty(n) {
+    if (n === null) return '';
+    const rounded = Math.round(n * 4) / 4; // round to nearest ¼
+    const whole = Math.floor(rounded);
+    const frac = rounded - whole;
+    const fracMap = { 0.25: '¼', 0.5: '½', 0.75: '¾', 0.33: '⅓', 0.67: '⅔' };
+    const fracStr = fracMap[frac] || (frac > 0 ? frac.toFixed(1).replace(/^0/, '') : '');
+    if (whole === 0) return fracStr || '—';
+    return fracStr ? `${whole} ${fracStr}` : `${whole}`;
+  }
+
+  // ── SLIDESHOW HELPER ─────────────────────────────────────────
+  function renderSlideshow(r) {
+    if (!r.images || !r.images.length) return r.emoji;
+    const imgs = r.images.map((img, i) =>
+      `<img src="${img}" class="slide${i===0?' active':''}" alt="${r.title}" loading="lazy">`
+    ).join('');
+    const controls = r.images.length > 1 ? `
+      <button class="slide-btn slide-prev" onclick="slidePrev(event,${r.id})">&#8249;</button>
+      <button class="slide-btn slide-next" onclick="slideNext(event,${r.id})">&#8250;</button>
+      <div class="slide-dots">${r.images.map((_,i) =>
+        `<span class="dot${i===0?' active':''}" onclick="slideTo(event,${r.id},${i})"></span>`
+      ).join('')}</div>` : '';
+    return `<div class="recipe-slideshow" id="ss-${r.id}">${imgs}${controls}</div>`;
+  }
+
+  // ── RENDER CARDS ─────────────────────────────────────────────
+  document.getElementById('recipes-grid').innerHTML = recipes.map(r => `
+    <div class="recipe-card" onclick="openRecipe(${r.id})">
+      <div class="recipe-img">
+        ${renderSlideshow(r)}
+        <span class="click-hint">Tap to open</span>
+      </div>
+      <div class="recipe-body">
+        <span class="recipe-tag">${r.tag}</span>
+        <div class="recipe-title">${r.title}</div>
+        <div class="recipe-desc">${r.desc}</div>
+        <div class="recipe-meta">
+          <span>⏱ ${r.time}</span>
+          <span>👥 ${r.baseServings} ${r.servingUnit}</span>
+          <span>⭐ ${r.difficulty}</span>
+        </div>
+      </div>
+    </div>`).join('');
+
+  // ── MODAL STATE ───────────────────────────────────────────────
+  let activeRecipe = null;
+  let currentServings = 2;
+
+  function openRecipe(id) {
+    activeRecipe = recipes.find(r => r.id === id);
+    currentServings = activeRecipe.baseServings;
+    renderModal();
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  }
+
+  function changeServings(delta) {
+    currentServings = Math.max(1, currentServings + delta);
+    renderIngredients();
+    document.getElementById('serving-count').textContent = currentServings;
+  }
+
+  function renderModal() {
+    const r = activeRecipe;
+    const hero = document.getElementById('modal-hero');
+    if (r.images && r.images.length) {
+      hero.style.padding = '0';
+      const imgs = r.images.map((img, i) =>
+        `<img src="${img}" class="slide${i===0?' active':''}" alt="${r.title}" loading="lazy">`
+      ).join('');
+      const controls = r.images.length > 1 ? `
+        <button class="slide-btn slide-prev" onclick="slidePrev(event,'modal')">&#8249;</button>
+        <button class="slide-btn slide-next" onclick="slideNext(event,'modal')">&#8250;</button>
+        <div class="slide-dots">${r.images.map((_,i) =>
+          `<span class="dot${i===0?' active':''}" onclick="slideTo(event,'modal',${i})"></span>`
+        ).join('')}</div>` : '';
+      hero.innerHTML = `<div class="recipe-slideshow modal-slideshow" id="ss-modal">${imgs}${controls}</div>`;
+    } else {
+      hero.style.padding = '';
+      hero.textContent = r.emoji;
+    }
+    document.getElementById('modal-tag').textContent = r.tag;
+    document.getElementById('modal-title').textContent = r.title;
+    document.getElementById('modal-meta').innerHTML = `
+      <span>⏱ ${r.time}</span>
+      <span>⭐ ${r.difficulty}</span>`;
+    document.getElementById('serving-label').textContent = `Servings (${r.servingUnit})`;
+    document.getElementById('serving-count').textContent = currentServings;
+    renderIngredients();
+    document.getElementById('steps-list').innerHTML = r.steps.map(s => `
+      <li class="step-row">
+        <span class="step-num">${r.steps.indexOf(s) + 1}</span>
+        <span class="step-text">${s}</span>
+      </li>`).join('');
+    document.getElementById('fun-fact-text').textContent = r.funFact;
+  }
+
+  function renderIngredients() {
+    const r = activeRecipe;
+    const scale = currentServings / r.baseServings;
+    document.getElementById('ingredients-list').innerHTML = r.ingredients.map(ing => {
+      const scaled = ing.qty !== null ? fmtQty(ing.qty * scale) : null;
+      const qtyStr = scaled !== null ? `${scaled}${ing.unit ? ' ' + ing.unit : ''}` : 'to taste';
+      return `<li class="ingredient-row">
+        <span class="ingredient-qty">${qtyStr}</span>
+        <span class="ingredient-name">${ing.name}</span>
+      </li>`;
+    }).join('');
+  }
+
+  // ── SLIDESHOW CONTROLS ───────────────────────────────────────
+  function slidePrev(e, id) { e.stopPropagation(); moveSlide(id, -1); }
+  function slideNext(e, id) { e.stopPropagation(); moveSlide(id, 1); }
+  function slideTo(e, id, idx) { e.stopPropagation(); setSlide(id, idx); }
+
+  function moveSlide(id, dir) {
+    const ss = document.getElementById('ss-' + id);
+    if (!ss) return;
+    const slides = ss.querySelectorAll('.slide');
+    const dots = ss.querySelectorAll('.dot');
+    const cur = [...slides].findIndex(s => s.classList.contains('active'));
+    const next = (cur + dir + slides.length) % slides.length;
+    slides[cur].classList.remove('active');
+    dots[cur]?.classList.remove('active');
+    slides[next].classList.add('active');
+    dots[next]?.classList.add('active');
+  }
+
+  function setSlide(id, idx) {
+    const ss = document.getElementById('ss-' + id);
+    if (!ss) return;
+    ss.querySelectorAll('.slide').forEach((s, i) => s.classList.toggle('active', i === idx));
+    ss.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === idx));
+  }
+
+  // Auto-advance card slideshows every 3.5s (not the modal)
+  setInterval(() => {
+    document.querySelectorAll('.recipe-slideshow:not(.modal-slideshow)').forEach(ss => {
+      if (ss.querySelectorAll('.slide').length > 1)
+        moveSlide(ss.id.replace('ss-', ''), 1);
+    });
+  }, 3500);
+
+  // Close on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  updateCartCount(); initNav();
+</script>
+</body>
+</html>

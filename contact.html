@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Contact Us - Godavari Mangoes</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,18 +12,35 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="shop.html">Shop</a></li>
-    <li><a href="contact.html" class="active">Contact</a></li>
-  </ul>
   <div class="nav-actions">
     <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
       🛒 <span class="cart-count" id="nav-cart-count">0</span>
     </button>
-    <a href="shop.html" class="btn btn-primary">Order Now</a>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
@@ -58,7 +76,7 @@
         <div class="contact-detail-icon">✉️</div>
         <div class="contact-detail-info">
           <h4>Email</h4>
-          <p>majetisiri@gmail.com</p>
+          <p>admin@godavarimangoes.com</p>
           <p style="font-size:.8rem;color:#aaa;">We reply within 24 hours</p>
         </div>
       </div>
@@ -221,7 +239,7 @@
     showToast('Message sent! We\'ll reply soon.');
   }
 
-  updateCartCount();
+  updateCartCount(); initNav();
 </script>
 </body>
 </html>

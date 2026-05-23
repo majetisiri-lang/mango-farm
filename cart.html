@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Cart & Checkout - Godavari Mangoes</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,17 +12,35 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
-  <ul class="nav-links">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="shop.html">Shop</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
   <div class="nav-actions">
-    <button class="cart-btn" title="Cart">
+    <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
       🛒 <span class="cart-count" id="nav-cart-count">0</span>
+    </button>
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
     </button>
   </div>
 </nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
 
 <!-- PAGE HEADER -->
 <div class="page-header">
@@ -55,13 +74,23 @@
     <div class="order-summary" id="order-summary-panel">
       <h3>Order Summary</h3>
       <div id="min-order-warning" style="display:none; background:#fff3e0; border:1px solid #ffb74d; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:.85rem; color:#e65100;">
-        ⚠️ Minimum order is <strong>10 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
+        ⚠️ Minimum order is <strong>5 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
       </div>
       <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
       <div class="summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
       <div class="summary-row"><span id="express-label" style="display:none;">Express</span><span id="sum-express" style="display:none;"></span></div>
-      <div class="summary-row"><span>Tax (5% GST)</span><span id="sum-tax">₹0</span></div>
+      <div class="summary-row" id="discount-row" style="display:none;color:var(--green);font-weight:600;"><span id="discount-label">Discount</span><span id="sum-discount"></span></div>
       <div class="summary-row total"><span>Total</span><span id="sum-total">₹0</span></div>
+
+      <!-- COUPON CODE -->
+      <div style="margin: 16px 0 4px;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="coupon-input" placeholder="Coupon code" oninput="this.value=this.value.toUpperCase()"
+            style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-size:.88rem;font-family:inherit;">
+          <button onclick="applyCoupon()" class="btn btn-outline" style="padding:9px 14px;font-size:.88rem;border-radius:10px;">Apply</button>
+        </div>
+        <div id="coupon-msg" style="font-size:.8rem;margin-top:6px;"></div>
+      </div>
 
       <hr class="divider">
 
@@ -69,29 +98,62 @@
       <div class="payment-title">📦 Delivery Address</div>
       <div class="form-group">
         <label>Full Name</label>
-        <input type="text" id="ship-name" placeholder="Your full name">
+        <input type="text" id="ship-name" placeholder="Your full name" oninput="validateForm()">
       </div>
       <div class="form-group">
         <label>Address</label>
-        <input type="text" id="ship-address" placeholder="Street address">
+        <input type="text" id="ship-address" placeholder="Street address" oninput="validateForm()">
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>City</label>
-          <input type="text" id="ship-city" placeholder="City">
+          <input type="text" id="ship-city" placeholder="City" oninput="validateCity(); validateForm()">
+          <div id="city-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ We currently ship within India only.</div>
         </div>
         <div class="form-group">
           <label>Postcode</label>
-          <input type="text" id="ship-zip" placeholder="ZIP / PIN">
+          <input type="text" id="ship-zip" placeholder="PIN Code" maxlength="6" oninput="autofillZone(); validateForm()">
+          <div id="pin-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 6-digit Indian PIN code.</div>
         </div>
       </div>
       <div class="form-group">
+        <label>State</label>
+        <select id="ship-state" onchange="validateForm()">
+          <option value="">Select state...</option>
+          <option>Andhra Pradesh</option><option>Arunachal Pradesh</option><option>Assam</option>
+          <option>Bihar</option><option>Chhattisgarh</option><option>Goa</option>
+          <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+          <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+          <option>Madhya Pradesh</option><option>Maharashtra</option><option>Manipur</option>
+          <option>Meghalaya</option><option>Mizoram</option><option>Nagaland</option>
+          <option>Odisha</option><option>Punjab</option><option>Rajasthan</option>
+          <option>Sikkim</option><option>Tamil Nadu</option><option>Telangana</option>
+          <option>Tripura</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+          <option>West Bengal</option><option>Andaman and Nicobar Islands</option>
+          <option>Chandigarh</option><option>Dadra and Nagar Haveli</option>
+          <option>Daman and Diu</option><option>Delhi</option><option>Jammu and Kashmir</option>
+          <option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option>
+        </select>
+      </div>
+      <div class="form-group">
         <label>Phone</label>
-        <input type="tel" id="ship-phone" placeholder="+91 00000 00000">
+        <div style="display:flex;gap:8px;">
+          <input type="tel" id="ship-phone" placeholder="+91 00000 00000" oninput="validatePhone(); validateForm()" style="flex:1;">
+          <button type="button" id="otp-send-btn" onclick="sendPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;white-space:nowrap;">Send OTP</button>
+        </div>
+        <div id="phone-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 10-digit Indian mobile number.</div>
+        <div id="otp-section" style="display:none;margin-top:10px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-family:inherit;">
+            <button type="button" onclick="verifyPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;">Verify</button>
+          </div>
+          <div id="otp-msg" style="font-size:.8rem;margin-top:6px;"></div>
+        </div>
+        <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
       </div>
       <div class="form-group">
         <label>Shipping Zone</label>
-        <select id="ship-zone" onchange="updateSummary()">
+        <select id="ship-zone" onchange="updateSummary(); validateForm()">
           <option value="">Select your zone...</option>
           <option value="ap">Andhra Pradesh — ₹100 base (1–2 days)</option>
           <option value="south">South India (TN, KA, TG, KL) — ₹150 base (2–3 days)</option>
@@ -110,30 +172,12 @@
       <div class="payment-title">💳 Payment Method</div>
       <div class="payment-options">
 
-        <label class="payment-option selected" id="opt-card">
-          <input type="radio" name="payment" value="card" checked onchange="selectPayment('card')">
+        <label class="payment-option selected" id="opt-online">
+          <input type="radio" name="payment" value="online" checked onchange="selectPayment('online')">
           <div class="payment-option-icon">💳</div>
           <div class="payment-option-label">
-            <div class="payment-option-name">Credit / Debit Card</div>
-            <div class="payment-option-desc">Visa, Mastercard, RuPay</div>
-          </div>
-        </label>
-
-        <label class="payment-option" id="opt-paypal">
-          <input type="radio" name="payment" value="paypal" onchange="selectPayment('paypal')">
-          <div class="payment-option-icon">🅿️</div>
-          <div class="payment-option-label">
-            <div class="payment-option-name">PayPal</div>
-            <div class="payment-option-desc">Fast & secure checkout</div>
-          </div>
-        </label>
-
-        <label class="payment-option" id="opt-upi">
-          <input type="radio" name="payment" value="upi" onchange="selectPayment('upi')">
-          <div class="payment-option-icon">📱</div>
-          <div class="payment-option-label">
-            <div class="payment-option-name">UPI</div>
-            <div class="payment-option-desc">GPay, PhonePe, Paytm</div>
+            <div class="payment-option-name">Pay Online</div>
+            <div class="payment-option-desc">Card, UPI, Net Banking, Wallets</div>
           </div>
         </label>
 
@@ -148,41 +192,10 @@
 
       </div>
 
-      <!-- CARD FORM -->
-      <div class="card-form show" id="card-form">
-        <div class="form-group">
-          <label>Card Number</label>
-          <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Expiry</label>
-            <input type="text" id="card-expiry" placeholder="MM / YY" maxlength="7" oninput="formatExpiry(this)">
-          </div>
-          <div class="form-group">
-            <label>CVV</label>
-            <input type="text" id="card-cvv" placeholder="•••" maxlength="3">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Name on Card</label>
-          <input type="text" id="card-name" placeholder="Full name as on card">
-        </div>
-      </div>
-
-      <!-- UPI FORM -->
-      <div class="card-form" id="upi-form">
-        <div class="form-group">
-          <label>UPI ID</label>
-          <input type="text" id="upi-id" placeholder="yourname@upi">
-        </div>
-        <p style="font-size:.8rem;color:#666;margin-top:4px">You'll receive a payment request on your UPI app.</p>
-      </div>
-
-      <!-- PAYPAL NOTICE -->
-      <div class="card-form" id="paypal-form">
+      <!-- ONLINE PAYMENT NOTICE -->
+      <div class="card-form show" id="online-form">
         <p style="font-size:.85rem;color:#555;text-align:center;">
-          You'll be redirected to PayPal to complete your payment securely.
+          A secure Razorpay payment window will open. Pay by card, UPI, net banking, or wallet.
         </p>
       </div>
 
@@ -217,6 +230,7 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="app.js"></script>
 <script>
   function renderCartPage() {
@@ -241,7 +255,7 @@
       const lineTotal = product.price * item.qty;
       return `
         <div class="cart-item">
-          <div class="cart-item-emoji"><img src="${product.image}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;"></div>
+          <div class="cart-item-emoji"><img src="${product.images && product.images[0] ? product.images[0] : ''}" alt="${product.name}" style="width:100%;height:100%;object-fit:cover;border-radius:10px;"></div>
           <div class="cart-item-details">
             <div class="cart-item-name">${product.name}</div>
             <div class="cart-item-variety">${product.size}</div>
@@ -259,6 +273,34 @@
     }).join('');
 
     updateSummary();
+  }
+
+  const COUPONS = { 'MANGO10': 10, 'MANGO20': 20 };
+  let appliedDiscount = 0;
+  let adminOverride = false;
+
+  function applyCoupon() {
+    const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+    const msg = document.getElementById('coupon-msg');
+    if (code === 'ADMIN123') {
+      adminOverride = true;
+      appliedDiscount = 0;
+      msg.style.color = 'var(--green)';
+      msg.textContent = '✓ Admin code applied!';
+      updateSummary();
+    } else if (COUPONS[code]) {
+      adminOverride = false;
+      appliedDiscount = COUPONS[code];
+      msg.style.color = 'var(--green)';
+      msg.textContent = `✓ Coupon applied — ${appliedDiscount}% off!`;
+      updateSummary();
+    } else {
+      adminOverride = false;
+      appliedDiscount = 0;
+      msg.style.color = 'var(--orange)';
+      msg.textContent = 'Invalid coupon code.';
+      updateSummary();
+    }
   }
 
   const SHIPPING_ZONES = {
@@ -286,11 +328,20 @@
     const express = document.getElementById('express-shipping').checked;
     const shipping = calcShipping(zone, totalKg);
     const expressCharge = express ? 125 : 0;
-    const tax = Math.round(subtotal * 0.05);
-    const total = subtotal + shipping + expressCharge + tax;
+    const discountAmt = Math.round(subtotal * appliedDiscount / 100);
+    const total = adminOverride ? 1 : subtotal - discountAmt + shipping + expressCharge;
 
     document.getElementById('sum-subtotal').textContent = `₹${subtotal}`;
     document.getElementById('sum-delivery').textContent = zone ? `₹${shipping}` : '— select zone';
+
+    const discountRow = document.getElementById('discount-row');
+    if (appliedDiscount > 0) {
+      discountRow.style.display = '';
+      document.getElementById('discount-label').textContent = `Discount (${appliedDiscount}%)`;
+      document.getElementById('sum-discount').textContent = `−₹${discountAmt}`;
+    } else {
+      discountRow.style.display = 'none';
+    }
 
     const expressLabel = document.getElementById('express-label');
     const expressEl = document.getElementById('sum-express');
@@ -301,7 +352,6 @@
       expressLabel.style.display = 'none'; expressEl.style.display = 'none';
     }
 
-    document.getElementById('sum-tax').textContent = `₹${tax}`;
     document.getElementById('sum-total').textContent = zone ? `₹${total}` : '—';
 
     const breakdown = document.getElementById('shipping-breakdown');
@@ -338,6 +388,7 @@
     if (cart[idx].qty <= 0) cart.splice(idx, 1);
     saveCart(cart);
     renderCartPage();
+    validateForm();
     updateCartCount();
   }
 
@@ -345,52 +396,316 @@
     let cart = getCart().filter(i => i.id !== id);
     saveCart(cart);
     renderCartPage();
+    validateForm();
     updateCartCount();
     showToast('Item removed from cart');
   }
 
+  let phoneVerified = false;
+  let lastVerifiedPhone = '';
+
+  async function sendPhoneOtp() {
+    const phone = document.getElementById('ship-phone').value.trim();
+    const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
+    if (!/^[6-9]\d{9}$/.test(digits)) {
+      showToast('Please enter a valid Indian mobile number first');
+      return;
+    }
+    const btn = document.getElementById('otp-send-btn');
+    btn.disabled = true; btn.textContent = 'Sending...';
+    try {
+      const res = await fetch('/api/send-phone-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        document.getElementById('otp-section').style.display = 'block';
+        document.getElementById('otp-msg').style.color = 'var(--green)';
+        document.getElementById('otp-msg').textContent = `OTP sent to ${phone}`;
+        btn.textContent = 'Resend OTP';
+        phoneVerified = false;
+        lastVerifiedPhone = '';
+        document.getElementById('phone-verified-msg').style.display = 'none';
+        validateForm();
+      } else {
+        showToast(data.error || 'Failed to send OTP');
+        btn.textContent = 'Send OTP';
+      }
+    } catch(e) {
+      showToast('Failed to send OTP. Try again.');
+      btn.textContent = 'Send OTP';
+    }
+    btn.disabled = false;
+  }
+
+  async function verifyPhoneOtp() {
+    const phone = document.getElementById('ship-phone').value.trim();
+    const otp = document.getElementById('otp-input').value.trim();
+    const msg = document.getElementById('otp-msg');
+    if (!otp || otp.length !== 6) { msg.style.color='#e53935'; msg.textContent='Enter the 6-digit OTP'; return; }
+    try {
+      const res = await fetch('/api/verify-phone-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        phoneVerified = true;
+        lastVerifiedPhone = phone;
+        document.getElementById('otp-section').style.display = 'none';
+        document.getElementById('phone-verified-msg').style.display = 'block';
+        msg.textContent = '';
+        validateForm();
+      } else {
+        msg.style.color = '#e53935';
+        msg.textContent = data.error || 'Invalid OTP. Try again.';
+      }
+    } catch(e) {
+      msg.style.color = '#e53935';
+      msg.textContent = 'Verification failed. Try again.';
+    }
+  }
+
+  function validateCity() {
+    const city = document.getElementById('ship-city').value.trim();
+    const err = document.getElementById('city-error');
+    if (!city) { err.style.display = 'none'; return; }
+    // Flag non-Indian patterns: commas, "City ST" format, known non-Indian abbreviations
+    const nonIndian = /,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase());
+    err.style.display = nonIndian ? 'block' : 'none';
+  }
+
+  function validatePhone() {
+    const phone = document.getElementById('ship-phone').value.trim();
+    const err = document.getElementById('phone-error');
+    if (!phone) { err.style.display = 'none'; return; }
+    const digits = phone.replace(/[\s\-\+]/g, '');
+    const valid = /^(\+91|91)?[6-9]\d{9}$/.test(digits) || /^[6-9]\d{9}$/.test(digits);
+    err.style.display = valid ? 'none' : 'block';
+    if (phone !== lastVerifiedPhone) {
+      phoneVerified = false;
+      document.getElementById('phone-verified-msg').style.display = 'none';
+      document.getElementById('otp-section').style.display = 'none';
+      document.getElementById('otp-send-btn').textContent = 'Send OTP';
+    }
+  }
+
+  function autofillZone() {
+    const pin = document.getElementById('ship-zip').value.trim();
+    const pinError = document.getElementById('pin-error');
+    if (!pin) { pinError.style.display = 'none'; return; }
+    if (!/^\d{6}$/.test(pin)) {
+      pinError.style.display = 'block';
+      document.getElementById('ship-zone').value = '';
+      updateSummary();
+      return;
+    }
+    const firstDigit = parseInt(pin[0]);
+    if (firstDigit === 0 || firstDigit === 9) {
+      pinError.style.display = 'block';
+      document.getElementById('ship-zone').value = '';
+      updateSummary();
+      return;
+    }
+    pinError.style.display = 'none';
+    const p = parseInt(pin.substring(0, 3));
+    let zone = '';
+    if (p >= 515 && p <= 535) zone = 'ap';                          // Andhra Pradesh
+    else if ((p >= 500 && p <= 514) || p === 536) zone = 'south';   // Telangana
+    else if (p >= 560 && p <= 577) zone = 'south';                  // Karnataka
+    else if (p >= 600 && p <= 643) zone = 'south';                  // Tamil Nadu
+    else if (p >= 670 && p <= 695) zone = 'south';                  // Kerala
+    else zone = 'india';                                             // Rest of India
+    const select = document.getElementById('ship-zone');
+    if (select.value !== zone) {
+      select.value = zone;
+      updateSummary();
+    }
+  }
+
+  function validateForm() {
+    const name = document.getElementById('ship-name').value.trim();
+    const address = document.getElementById('ship-address').value.trim();
+    const city = document.getElementById('ship-city').value.trim();
+    const zip = document.getElementById('ship-zip').value.trim();
+    const phone = document.getElementById('ship-phone').value.trim();
+    const state = document.getElementById('ship-state').value;
+    const zone = document.getElementById('ship-zone').value;
+    const phoneDigits = phone.replace(/[\s\-\+]/g, '');
+    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
+    const pinValid = /^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8;
+    const cityNonIndian = city && (/,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase()));
+    const phoneVerifiedOk = phoneVerified && lastVerifiedPhone === phone;
+    const totalKg = getTotalKg(getCart());
+    const allValid = name && address && city && !cityNonIndian && pinValid && phoneValid && phoneVerifiedOk && state && zone && totalKg >= MIN_KG;
+    const btn = document.querySelector('.checkout-btn');
+    if (btn) {
+      btn.disabled = !allValid;
+      btn.style.opacity = allValid ? '1' : '0.5';
+      btn.style.cursor = allValid ? 'pointer' : 'not-allowed';
+    }
+  }
+
   function selectPayment(method) {
-    ['card','paypal','upi','cod'].forEach(m => {
+    ['online', 'cod'].forEach(m => {
       document.getElementById(`opt-${m}`).classList.toggle('selected', m === method);
       const form = document.getElementById(`${m}-form`);
       if (form) form.classList.toggle('show', m === method);
     });
   }
 
-  function formatCard(el) {
-    let v = el.value.replace(/\D/g,'').substring(0,16);
-    el.value = v.replace(/(.{4})/g,'$1 ').trim();
+  function getOrderTotal() {
+    const cart = getCart();
+    const subtotal = cart.reduce((sum, item) => {
+      const p = products.find(p => p.id === item.id);
+      return sum + (p ? p.price * item.qty : 0);
+    }, 0);
+    const zone = document.getElementById('ship-zone').value;
+    const express = document.getElementById('express-shipping').checked;
+    const totalKg = getTotalKg(cart);
+    const shipping = calcShipping(zone, totalKg);
+    const expressCharge = express ? 125 : 0;
+    const discountAmt = Math.round(subtotal * appliedDiscount / 100);
+    return adminOverride ? 1 : subtotal - discountAmt + shipping + expressCharge;
   }
 
-  function formatExpiry(el) {
-    let v = el.value.replace(/\D/g,'').substring(0,4);
-    if (v.length >= 2) v = v.slice(0,2) + ' / ' + v.slice(2);
-    el.value = v;
+  async function showOrderSuccess(paymentId) {
+    const cart = getCart();
+    const orderNum = 'MF-' + Math.random().toString(36).substring(2,8).toUpperCase();
+    const items = cart.map(item => {
+      const p = products.find(p => p.id === item.id);
+      return { name: p.name, qty: item.qty, price: p.price };
+    });
+    const order = {
+      orderNum,
+      total: getOrderTotal(),
+      items,
+      paymentId: paymentId || 'COD',
+      address: document.getElementById('ship-name').value.trim(),
+      status: 'Confirmed',
+    };
+    const token = localStorage.getItem('mgf_token');
+    try {
+      await fetch('/api/save-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, order }),
+      });
+    } catch (e) {}
+    saveCart([]);
+    updateCartCount();
+    document.getElementById('cart-content').style.display = 'none';
+    document.getElementById('order-success').classList.add('show');
+    document.getElementById('order-num-display').textContent = `Order #${orderNum}`;
   }
 
-  function placeOrder() {
+  async function placeOrder() {
     const cart = getCart();
     if (cart.length === 0) { showToast('Your cart is empty!'); return; }
     if (getTotalKg(cart) < MIN_KG) { showToast('Minimum order is 10 kg!'); return; }
 
     const name = document.getElementById('ship-name').value.trim();
     const address = document.getElementById('ship-address').value.trim();
+    const phone = document.getElementById('ship-phone').value.trim();
     const zone = document.getElementById('ship-zone').value;
-    if (!name || !address) { showToast('Please fill in your delivery address'); return; }
+    const city = document.getElementById('ship-city').value.trim();
+    const zip = document.getElementById('ship-zip').value.trim();
+    if (!name) { showToast('Please enter your full name'); return; }
+    if (!address) { showToast('Please enter your street address'); return; }
+    if (!city) { showToast('Please enter your city'); return; }
+    if (!zip) { showToast('Please enter your PIN code'); return; }
+    if (!/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
     if (!zone) { showToast('Please select a shipping zone'); return; }
+    const phoneDigits = phone.replace(/[\s\-\+]/g, '');
+    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
+    if (!phone) { showToast('Please enter your phone number'); return; }
+    if (!phoneValid) { showToast('Please enter a valid 10-digit Indian mobile number'); return; }
 
-    // Simulate placing order
-    const orderNum = 'MF-' + Math.random().toString(36).substring(2,8).toUpperCase();
-    saveCart([]);
-    updateCartCount();
+    const method = document.querySelector('input[name="payment"]:checked').value;
 
-    document.getElementById('cart-content').style.display = 'none';
-    document.getElementById('order-success').classList.add('show');
-    document.getElementById('order-num-display').textContent = `Order #${orderNum}`;
+    if (method === 'cod') {
+      showOrderSuccess(null);
+      return;
+    }
+
+    // Online payment via Razorpay
+    const totalRupees = getOrderTotal();
+    const amountPaise = totalRupees * 100;
+
+    const btn = document.querySelector('.checkout-btn');
+    btn.disabled = true;
+    btn.textContent = 'Opening payment...';
+
+    try {
+      const orderRes = await fetch('/api/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amountPaise }),
+      });
+      const orderData = await orderRes.json();
+      if (!orderData.orderId) throw new Error(orderData.error || 'Order creation failed');
+
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: 'INR',
+        name: 'Godavari Mangoes',
+        description: 'Fresh mangoes from our farm',
+        order_id: orderData.orderId,
+        prefill: {
+          name,
+          contact: phone,
+        },
+        theme: { color: '#2e7d32' },
+        handler: async function (response) {
+          try {
+            const verifyRes = await fetch('/api/verify-payment', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+            const verifyData = await verifyRes.json();
+            if (verifyData.verified) {
+              showOrderSuccess(response.razorpay_payment_id);
+            } else {
+              showToast('Payment verification failed. Please contact us.');
+            }
+          } catch (e) {
+            showToast('Could not verify payment. Please contact us.');
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            btn.disabled = false;
+            btn.textContent = 'Place Order  →';
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.on('payment.failed', function () {
+        showToast('Payment failed. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Place Order  →';
+      });
+      rzp.open();
+    } catch (err) {
+      showToast(err.message || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Place Order  →';
+    }
   }
 
   renderCartPage();
-  updateCartCount();
+  validateForm();
+  updateCartCount(); initNav();
 </script>
 </body>
 </html>

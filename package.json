@@ -1,0 +1,9 @@
+{
+  "name": "mango-farm",
+  "version": "1.0.0",
+  "dependencies": {
+    "razorpay": "^2.9.2",
+    "resend": "^3.2.0",
+    "@upstash/redis": "^1.28.0"
+  }
+}

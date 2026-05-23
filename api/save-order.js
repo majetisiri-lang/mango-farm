@@ -1,7 +1,7 @@
 const { Redis } = require('@upstash/redis');
 const { Resend } = require('resend');
 
-const NOTIFY_EMAILS = ['majetisiri@gmail.com', 'aksanudeep@gmail.com', 'admin@godavarimangoes.com'];
+const NOTIFY_EMAILS = ['majetisiri@gmail.com', 'aksanudeep@gmail.com', 'admin@godavarimangoes.com', 'alsramya@gmail.com'];
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).end();

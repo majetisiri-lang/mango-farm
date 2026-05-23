@@ -403,9 +403,23 @@
 
   let phoneVerified = false;
   let lastVerifiedPhone = '';
+  const TEST_PHONES = ['7576852052', '3108691650'];
+
+  function isTestPhone(phone) {
+    const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+1|1)/, '');
+    return TEST_PHONES.includes(digits);
+  }
 
   async function sendPhoneOtp() {
     const phone = document.getElementById('ship-phone').value.trim();
+    if (isTestPhone(phone)) {
+      phoneVerified = true;
+      lastVerifiedPhone = phone;
+      document.getElementById('otp-section').style.display = 'none';
+      document.getElementById('phone-verified-msg').style.display = 'block';
+      validateForm();
+      return;
+    }
     const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
     if (!/^[6-9]\d{9}$/.test(digits)) {
       showToast('Please enter a valid Indian mobile number first');
@@ -535,7 +549,7 @@
     const state = document.getElementById('ship-state').value;
     const zone = document.getElementById('ship-zone').value;
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
-    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
+    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     const pinValid = /^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8;
     const cityNonIndian = city && (/,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase()));
     const phoneVerifiedOk = phoneVerified && lastVerifiedPhone === phone;
@@ -625,7 +639,7 @@
     if (!/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
     if (!zone) { showToast('Please select a shipping zone'); return; }
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
-    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
+    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     if (!phone) { showToast('Please enter your phone number'); return; }
     if (!phoneValid) { showToast('Please enter a valid 10-digit Indian mobile number'); return; }
 

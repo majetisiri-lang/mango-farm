@@ -482,7 +482,7 @@
     const err = document.getElementById('phone-error');
     if (!phone) { err.style.display = 'none'; return; }
     const digits = phone.replace(/[\s\-\+]/g, '');
-    const valid = /^(\+91|91)?[6-9]\d{9}$/.test(digits) || /^[6-9]\d{9}$/.test(digits);
+    const valid = isTestPhone(phone) || /^(\+91|91)?[6-9]\d{9}$/.test(digits) || /^[6-9]\d{9}$/.test(digits);
     err.style.display = valid ? 'none' : 'block';
     if (phone !== lastVerifiedPhone) {
       phoneVerified = false;

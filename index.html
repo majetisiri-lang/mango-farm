@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥭</text></svg>" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Godavari Mangoes - Fresh Farm-Direct Mangoes</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,24 +12,40 @@
 <!-- NAVBAR -->
 <nav class="navbar">
   <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
-  <ul class="nav-links">
-    <li><a href="index.html" class="active">Home</a></li>
-    <li><a href="shop.html">Shop</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
   <div class="nav-actions">
     <button class="cart-btn" onclick="window.location.href='cart.html'" title="View Cart">
       🛒 <span class="cart-count" id="nav-cart-count">0</span>
     </button>
-    <a href="shop.html" class="btn btn-primary">Order Now</a>
-
+    <button class="burger-btn" onclick="toggleDrawer()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="nav-overlay" id="nav-overlay" onclick="toggleDrawer()"></div>
+<aside class="nav-drawer" id="nav-drawer">
+  <div class="drawer-top">
+    <a href="index.html" class="nav-logo"><span>🥭</span> Godavari Mangoes</a>
+    <button class="drawer-close" onclick="toggleDrawer()">✕</button>
+  </div>
+  <nav class="drawer-links">
+    <a href="index.html">Home</a>
+    <a href="shop.html">Products</a>
+    <a href="gallery.html">Gallery</a>
+    <a href="recipes.html">Recipes</a>
+    <a href="blog.html">Blog</a>
+    <a href="contact.html">Contact</a>
+    <a href="login.html" id="drawer-login">Login</a>
+    <a href="account.html" id="drawer-account" style="display:none">Account</a>
+  </nav>
+  <div class="drawer-bottom" id="drawer-bottom" style="display:none">
+    <button class="btn btn-outline" onclick="logoutUser()" style="width:100%">Logout</button>
+  </div>
+</aside>
 
 <!-- HERO -->
 <section class="hero">
   <div class="hero-content">
-    <h1 class="hero-title">Fresh Mangoes,<br><span>Straight From</span><br>Our Farm</h1>
+    <h1 class="hero-title">Fresh Mangoes,<br><span>Straight From</span><br>Our Farm.</h1>
     <p class="hero-sub">Hand-picked, sun-ripened mangoes delivered to your door. No middlemen — just pure farm goodness.</p>
     <div class="hero-actions">
       <a href="shop.html" class="btn btn-primary btn-lg">Shop Mangoes</a>
@@ -36,7 +53,7 @@
     </div>
   </div>
   <div class="hero-img">
-    <div class="hero-emoji">🥭</div>
+    <img src="images/home.png" alt="Fresh Godavari Mangoes" class="hero-mango-img">
   </div>
 </section>
 
@@ -63,22 +80,12 @@
   </div>
 </section>
 
-<!-- PRODUCTS PREVIEW -->
-<section class="section bg-light">
-  <h2 class="section-title">Popular Varieties</h2>
-  <p class="section-sub">Select from our finest mango varieties, freshly harvested.</p>
-  <div class="products-grid" id="home-products"></div>
-  <div style="text-align:center; margin-top:36px;">
-    <a href="shop.html" class="btn btn-green btn-lg">View All Varieties</a>
-  </div>
-</section>
 
 <!-- ABOUT STRIP -->
 <section class="about-strip">
   <div>
     <h2>A Family Farm With a Passion for Mangoes</h2>
-    <p>We've been cultivating mangoes for over 30 years, passing down knowledge from generation to generation. We nurture every tree with care and respect for the environment.</p>
-    <p>We believe in sustainable farming and take pride in delivering the finest mangoes straight from our farm to your door.</p>
+    <p>For over 100 years, our family has been growing mangoes in the Godavari region. While our farms have traditionally supplied trusted wholesale markets, we now also deliver premium farm-fresh mangoes directly to customers.</p>
     <a href="contact.html" class="btn btn-primary">Get in Touch</a>
   </div>
   <div class="stats-grid">
@@ -87,7 +94,7 @@
       <div class="stat-label">Years of Farming</div>
     </div>
     <div class="stat-card">
-      <div class="stat-num">4</div>
+      <div class="stat-num">10</div>
       <div class="stat-label">Mango Varieties</div>
     </div>
     <div class="stat-card">
@@ -97,46 +104,6 @@
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
-<section class="section">
-  <h2 class="section-title">What Our Customers Say</h2>
-  <p class="section-sub">Real reviews from real mango lovers.</p>
-  <div class="testimonials-grid">
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"The Banginpalli mangoes were absolutely incredible — so juicy and sweet with zero fibre. You can taste the difference when it comes straight from the farm. Already placed my second order!"</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">👩</div>
-        <div>
-          <div class="author-name">Priya S.</div>
-          <div class="author-loc">Bangalore</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"Ordered the Panduru Mamidi Rasalu for the first time and was blown away. That sherbet-like sweetness is unlike anything I've had before. Packaging was perfect too — arrived fresh and undamaged."</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">👨</div>
-        <div>
-          <div class="author-name">Rahul M.</div>
-          <div class="author-loc">Hyderabad</div>
-        </div>
-      </div>
-    </div>
-    <div class="testimonial-card">
-      <div class="stars">★★★★★</div>
-      <p class="testimonial-text">"Got the Chilakamukku Kayalu for my family and everyone couldn't stop eating them! That firm texture and tangy-sweet taste is so unique. Thank you, Godavari Mangoes — this is now our yearly tradition!"</p>
-      <div class="testimonial-author">
-        <div class="author-avatar">👩</div>
-        <div>
-          <div class="author-name">Anita K.</div>
-          <div class="author-loc">Vijayawada</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- FOOTER -->
 <footer>
@@ -184,10 +151,7 @@
 
 <script src="app.js"></script>
 <script>
-  // Render 4 featured products on home page
-  document.getElementById('home-products').innerHTML =
-    products.map(renderProductCard).join('');
-  updateCartCount();
+  updateCartCount(); initNav();
 </script>
 </body>
 </html>

@@ -627,6 +627,7 @@
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     if (!phone) { showToast('Please enter your phone number'); return; }
     if (!phoneValid) { showToast('Please enter a valid 10-digit Indian mobile number'); return; }
+    if (!phoneVerified || lastVerifiedPhone !== phone) { showToast('Please verify your phone number with OTP first'); return; }
 
     // Online payment via Razorpay
     const totalRupees = getOrderTotal();

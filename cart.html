@@ -584,7 +584,12 @@
       total: getOrderTotal(),
       items,
       paymentId: paymentId || 'COD',
-      address: document.getElementById('ship-name').value.trim(),
+      name: document.getElementById('ship-name').value.trim(),
+      address: document.getElementById('ship-address').value.trim(),
+      city: document.getElementById('ship-city').value.trim(),
+      zip: document.getElementById('ship-zip').value.trim(),
+      phone: document.getElementById('ship-phone').value.trim(),
+      zone: document.getElementById('ship-zone').value,
       status: 'Confirmed',
     };
     const token = localStorage.getItem('mgf_token');

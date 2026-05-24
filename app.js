@@ -36,7 +36,7 @@ function addToCart(productId) {
   if (existing) {
     existing.qty += 1;
   } else {
-    cart.push({ id: productId, qty: 1 });
+    cart.push({ id: productId, qty: 5 });
   }
   saveCart(cart);
   updateCartCount();

@@ -142,7 +142,7 @@
       </div>
       <div class="co-delivery-options">
         <label class="co-delivery-opt" id="zone-opt-pickup">
-          <input type="radio" name="zone" value="pickup" onchange="document.getElementById('ship-zone').value='pickup'; updateSummary(); validateForm();">
+          <input type="radio" name="zone" value="pickup" onchange="setDeliveryZone('pickup')">
           <div class="co-delivery-opt-body">
             <div class="co-delivery-opt-name">🏡 Farm Pickup</div>
             <div class="co-delivery-opt-desc">Collect from Narsapur, Andhra Pradesh</div>
@@ -150,7 +150,7 @@
           <div class="co-delivery-opt-price free">FREE</div>
         </label>
         <label class="co-delivery-opt" id="zone-opt-ap">
-          <input type="radio" name="zone" value="ap" onchange="document.getElementById('ship-zone').value='ap'; updateSummary(); validateForm();">
+          <input type="radio" name="zone" value="ap" onchange="setDeliveryZone('ap')">
           <div class="co-delivery-opt-body">
             <div class="co-delivery-opt-name">🚚 Andhra Pradesh</div>
             <div class="co-delivery-opt-desc">Door delivery via DTDC</div>
@@ -158,7 +158,7 @@
           <div class="co-delivery-opt-price">₹60/kg</div>
         </label>
         <label class="co-delivery-opt" id="zone-opt-south">
-          <input type="radio" name="zone" value="south" onchange="document.getElementById('ship-zone').value='south'; updateSummary(); validateForm();">
+          <input type="radio" name="zone" value="south" onchange="setDeliveryZone('south')">
           <div class="co-delivery-opt-body">
             <div class="co-delivery-opt-name">🚚 South India</div>
             <div class="co-delivery-opt-desc">TN, KA, TG, KL — Door delivery via DTDC</div>
@@ -522,21 +522,28 @@
     }
   }
 
+  function setDeliveryZone(zone) {
+    document.getElementById('ship-zone').value = zone;
+    document.querySelectorAll('input[name="zone"]').forEach(r => {
+      r.checked = (r.value === zone);
+    });
+    updateSummary();
+    validateForm();
+  }
+
   function autofillZone() {
     const pin = document.getElementById('ship-zip').value.trim();
     const pinError = document.getElementById('pin-error');
     if (!pin) { pinError.style.display = 'none'; return; }
     if (!/^\d{6}$/.test(pin)) {
       pinError.style.display = 'block';
-      document.getElementById('ship-zone').value = '';
-      updateSummary();
+      setDeliveryZone('');
       return;
     }
     const firstDigit = parseInt(pin[0]);
     if (firstDigit === 0 || firstDigit === 9) {
       pinError.style.display = 'block';
-      document.getElementById('ship-zone').value = '';
-      updateSummary();
+      setDeliveryZone('');
       return;
     }
     pinError.style.display = 'none';
@@ -548,12 +555,8 @@
     else if (p >= 600 && p <= 643) zone = 'south';                  // Tamil Nadu
     else if (p >= 670 && p <= 695) zone = 'south';                  // Kerala
     else zone = 'south';                                             // Default to South India
-    const select = document.getElementById('ship-zone');
-    if (select.value === 'pickup') return; // don't overwrite pickup selection
-    if (select.value !== zone) {
-      select.value = zone;
-      updateSummary();
-    }
+    if (document.getElementById('ship-zone').value === 'pickup') return;
+    setDeliveryZone(zone);
   }
 
   function validateForm() {

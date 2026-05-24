@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
   const data = await response.json();
   if (!data.return) {
     console.error('Fast2SMS error:', JSON.stringify(data));
-    const msg = (data.message && data.message[0]) || JSON.stringify(data);
+    const msg = (Array.isArray(data.message) ? data.message.join(', ') : data.message) || JSON.stringify(data);
     return res.status(500).json({ error: msg });
   }
 

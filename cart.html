@@ -41,42 +41,65 @@
   </div>
 </aside>
 
-<!-- PAGE HEADER -->
-<div class="page-header">
-  <h1>🛒 Your Cart</h1>
-  <p>Review your items and complete your order.</p>
-</div>
-
-<!-- ORDER SUCCESS (hidden until checkout) -->
+<!-- ORDER SUCCESS -->
 <div class="order-success" id="order-success">
   <div class="success-icon">🎉</div>
   <h2>Order Placed Successfully!</h2>
   <p>Thank you for your order. We'll start preparing your fresh mangoes right away.</p>
   <div class="order-num" id="order-num-display"></div>
-  <p style="color:#666; font-size:.9rem">You'll receive a confirmation email shortly. Expect delivery in 2–4 business days.</p>
-  <div style="margin-top:28px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap;">
+  <p style="color:#666;font-size:.9rem">You'll receive a confirmation shortly. Expect delivery based on your selected method.</p>
+  <div style="margin-top:28px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
     <a href="shop.html" class="btn btn-green btn-lg">Continue Shopping</a>
     <a href="index.html" class="btn btn-outline btn-lg">Back to Home</a>
   </div>
 </div>
 
-<!-- CART LAYOUT -->
-<div class="cart-layout" id="cart-content">
+<!-- CHECKOUT LAYOUT -->
+<div class="co-layout" id="cart-content">
 
-  <!-- CART ITEMS -->
-  <div class="checkout-section" id="cart-items-container"></div>
+  <!-- LEFT COLUMN -->
+  <div class="co-left">
 
-  <!-- DELIVERY DETAILS -->
-  <div class="checkout-section checkout-card">
-    <div class="checkout-section-title">📦 Delivery Details</div>
-    <div class="form-group">
-      <label>Full Name</label>
-      <input type="text" id="ship-name" placeholder="Your full name" oninput="validateForm()">
+    <!-- CART ITEMS -->
+    <div class="co-card" id="cart-items-container"></div>
+
+    <!-- STEP 1: CONTACT -->
+    <div class="co-card">
+      <div class="co-step-header">
+        <div class="co-step-num">1</div>
+        <div class="co-step-title">Contact & Address</div>
+      </div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="ship-name" placeholder="Your full name" oninput="validateForm()">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <div style="display:flex;gap:8px;">
+          <input type="tel" id="ship-phone" placeholder="+91 00000 00000" oninput="validatePhone(); validateForm()" style="flex:1;">
+          <button type="button" id="otp-send-btn" onclick="sendPhoneOtp()" class="btn btn-outline" style="padding:9px 14px;font-size:.85rem;border-radius:10px;white-space:nowrap;">Send OTP</button>
+        </div>
+        <div id="phone-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 10-digit Indian mobile number.</div>
+        <div id="otp-section" style="display:none;margin-top:10px;">
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-family:inherit;">
+            <button type="button" onclick="verifyPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;">Verify</button>
+          </div>
+          <div id="otp-msg" style="font-size:.8rem;margin-top:6px;"></div>
+        </div>
+        <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
+      </div>
     </div>
-    <div id="address-fields">
+
+    <!-- STEP 2: DELIVERY ADDRESS -->
+    <div class="co-card" id="address-fields">
+      <div class="co-step-header">
+        <div class="co-step-num">2</div>
+        <div class="co-step-title">Delivery Address</div>
+      </div>
       <div class="form-group">
         <label>Street Address</label>
-        <input type="text" id="ship-address" placeholder="Street address" oninput="validateForm()">
+        <input type="text" id="ship-address" placeholder="House no., street, area" oninput="validateForm()">
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -86,7 +109,7 @@
         </div>
         <div class="form-group">
           <label>PIN Code</label>
-          <input type="text" id="ship-zip" placeholder="PIN Code" maxlength="6" oninput="autofillZone(); validateForm()">
+          <input type="text" id="ship-zip" placeholder="6-digit PIN" maxlength="6" oninput="autofillZone(); validateForm()">
           <div id="pin-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 6-digit Indian PIN code.</div>
         </div>
       </div>
@@ -110,73 +133,86 @@
         </select>
       </div>
     </div>
-    <div class="form-group">
-      <label>Phone</label>
-      <div style="display:flex;gap:8px;">
-        <input type="tel" id="ship-phone" placeholder="+91 00000 00000" oninput="validatePhone(); validateForm()" style="flex:1;">
-        <button type="button" id="otp-send-btn" onclick="sendPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;white-space:nowrap;">Send OTP</button>
-      </div>
-      <div id="phone-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 10-digit Indian mobile number.</div>
-      <div id="otp-section" style="display:none;margin-top:10px;">
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-family:inherit;">
-          <button type="button" onclick="verifyPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;">Verify</button>
-        </div>
-        <div id="otp-msg" style="font-size:.8rem;margin-top:6px;"></div>
-      </div>
-      <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
-    </div>
 
-    <!-- DELIVERY METHOD — highlighted -->
-    <div class="delivery-method-box">
-      <div class="delivery-method-label">🚚 Delivery Method</div>
-      <select id="ship-zone" onchange="updateSummary(); validateForm()">
-        <option value="">Select delivery method...</option>
-        <option value="pickup">Pickup from Farm (Free) — Narsapur, Andhra Pradesh</option>
-        <option value="ap">Andhra Pradesh — ₹60/kg (Door Delivery)</option>
-        <option value="south">South India (TN, KA, TG, KL) — ₹80/kg (Door Delivery)</option>
-      </select>
-      <div id="pickup-notice" style="display:none;background:#d6f5e3;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#1a5c36;margin-top:8px;">
+    <!-- STEP 3: DELIVERY METHOD -->
+    <div class="co-card">
+      <div class="co-step-header">
+        <div class="co-step-num">3</div>
+        <div class="co-step-title">Delivery Method</div>
+      </div>
+      <div class="co-delivery-options">
+        <label class="co-delivery-opt" id="zone-opt-pickup">
+          <input type="radio" name="zone" value="pickup" onchange="document.getElementById('ship-zone').value='pickup'; updateSummary(); validateForm();">
+          <div class="co-delivery-opt-body">
+            <div class="co-delivery-opt-name">🏡 Farm Pickup</div>
+            <div class="co-delivery-opt-desc">Collect from Narsapur, Andhra Pradesh</div>
+          </div>
+          <div class="co-delivery-opt-price free">FREE</div>
+        </label>
+        <label class="co-delivery-opt" id="zone-opt-ap">
+          <input type="radio" name="zone" value="ap" onchange="document.getElementById('ship-zone').value='ap'; updateSummary(); validateForm();">
+          <div class="co-delivery-opt-body">
+            <div class="co-delivery-opt-name">🚚 Andhra Pradesh</div>
+            <div class="co-delivery-opt-desc">Door delivery via DTDC</div>
+          </div>
+          <div class="co-delivery-opt-price">₹60/kg</div>
+        </label>
+        <label class="co-delivery-opt" id="zone-opt-south">
+          <input type="radio" name="zone" value="south" onchange="document.getElementById('ship-zone').value='south'; updateSummary(); validateForm();">
+          <div class="co-delivery-opt-body">
+            <div class="co-delivery-opt-name">🚚 South India</div>
+            <div class="co-delivery-opt-desc">TN, KA, TG, KL — Door delivery via DTDC</div>
+          </div>
+          <div class="co-delivery-opt-price">₹80/kg</div>
+        </label>
+      </div>
+      <select id="ship-zone" onchange="updateSummary(); validateForm()" style="display:none;"></select>
+      <div id="pickup-notice" style="display:none;background:#f0faf4;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#1a5c36;margin-top:10px;">
         🏡 Collect from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge.
       </div>
-      <div id="shipping-breakdown" style="font-size:.82rem;color:#1a5c36;margin-top:8px;display:none;"></div>
-      <div style="margin-top:12px;font-size:.78rem;color:#555;line-height:1.6;border-top:1px solid #b2dfcb;padding-top:10px;">
-        📦 We ship via <strong>DTDC</strong> for door-to-door delivery. For a cheaper option, we also dispatch via <strong>ANL</strong> or <strong>Navitha</strong> transport — you collect from their nearest branch.
-        <a href="contact.html" style="color:var(--green);font-weight:600;">Contact us</a> to arrange.
-      </div>
+      <div id="shipping-breakdown" style="font-size:.82rem;color:#555;margin-top:10px;display:none;"></div>
+      <p style="font-size:.75rem;color:#999;margin-top:12px;line-height:1.6;">Need a cheaper option? We also ship via <strong>ANL</strong> or <strong>Navitha</strong> (branch pickup). <a href="contact.html" style="color:var(--green);">Contact us</a> to arrange.</p>
     </div>
+
   </div>
 
-  <!-- ORDER SUMMARY -->
-  <div class="checkout-section checkout-card" id="order-summary-panel">
-    <div class="checkout-section-title">🧾 Order Summary</div>
-    <div id="min-order-warning" style="display:none; background:#fff3e0; border:1px solid #ffb74d; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:.85rem; color:#e65100;">
-      ⚠️ Minimum order is <strong>5 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
-    </div>
-    <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
-    <div class="summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
-    <div class="summary-row" id="discount-row" style="display:none;color:var(--green);font-weight:600;"><span id="discount-label">Discount</span><span id="sum-discount"></span></div>
-    <div class="summary-row total"><span>Total</span><span id="sum-total">₹0</span></div>
-    <div style="margin-top:16px;">
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="coupon-input" placeholder="Coupon code" oninput="this.value=this.value.toUpperCase()"
-          style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-size:.88rem;font-family:inherit;">
-        <button onclick="applyCoupon()" class="btn btn-outline" style="padding:9px 14px;font-size:.88rem;border-radius:10px;">Apply</button>
-      </div>
-      <div id="coupon-msg" style="font-size:.8rem;margin-top:6px;"></div>
-    </div>
-  </div>
+  <!-- RIGHT COLUMN: ORDER SUMMARY -->
+  <div class="co-right">
+    <div class="co-summary" id="order-summary-panel">
+      <div class="co-summary-title">Order Summary</div>
 
-  <!-- PLACE ORDER -->
-  <div class="checkout-section checkout-card" style="text-align:center;">
-    <p style="font-size:.85rem;color:#555;margin-bottom:16px;">
-      🔐 A secure Razorpay payment window will open. Pay by card, UPI, net banking, or wallet.
-    </p>
-    <button class="btn btn-green checkout-btn" onclick="placeOrder()" style="width:100%;font-size:1.05rem;padding:14px;">
-      Place Order &nbsp;→
-    </button>
-    <div id="form-hints" style="font-size:.8rem;color:#e53935;margin-top:12px;line-height:1.8;display:none;text-align:left;"></div>
-    <p class="secure-note">🔒 Secured with 256-bit SSL encryption</p>
+      <!-- Items mini list -->
+      <div id="co-items-list" style="margin-bottom:16px;"></div>
+
+      <div id="min-order-warning" style="display:none;background:#fff3e0;border:1px solid #ffb74d;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.82rem;color:#e65100;">
+        ⚠️ Minimum order is <strong>5 kg</strong>. You have <strong id="current-kg">0 kg</strong>.
+      </div>
+
+      <div class="co-summary-rows">
+        <div class="co-summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
+        <div class="co-summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
+        <div class="co-summary-row" id="discount-row" style="display:none;color:var(--green);font-weight:600;"><span id="discount-label">Discount</span><span id="sum-discount"></span></div>
+        <div class="co-summary-row co-summary-total"><span>Total</span><span id="sum-total">₹0</span></div>
+      </div>
+
+      <!-- Coupon -->
+      <div style="margin-bottom:16px;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="coupon-input" placeholder="Coupon code" oninput="this.value=this.value.toUpperCase()"
+            style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:8px 12px;font-size:.85rem;font-family:inherit;">
+          <button onclick="applyCoupon()" class="btn btn-outline" style="padding:8px 14px;font-size:.85rem;border-radius:10px;">Apply</button>
+        </div>
+        <div id="coupon-msg" style="font-size:.78rem;margin-top:5px;"></div>
+      </div>
+
+      <button class="btn btn-green checkout-btn" onclick="placeOrder()" style="width:100%;font-size:1rem;padding:14px;border-radius:12px;font-weight:800;">
+        Place Order →
+      </button>
+      <div id="form-hints" style="font-size:.78rem;color:#e53935;margin-top:10px;line-height:1.8;display:none;"></div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:.75rem;color:#999;">
+        🔒 Secured with 256-bit SSL · Powered by Razorpay
+      </div>
+    </div>
   </div>
 
 </div>
@@ -288,6 +324,20 @@
       const p = products.find(p => p.id === item.id);
       return sum + (p ? p.price * item.qty : 0);
     }, 0);
+
+    // Populate mini items list in summary
+    const coItemsList = document.getElementById('co-items-list');
+    if (coItemsList) {
+      coItemsList.innerHTML = cart.map(item => {
+        const p = products.find(p => p.id === item.id);
+        if (!p) return '';
+        return `<div class="co-item-mini">
+          <img class="co-item-mini-img" src="${p.images && p.images[0] ? p.images[0] : ''}" alt="${p.name}">
+          <div class="co-item-mini-name">${p.name}<div class="co-item-mini-qty">${item.qty} kg</div></div>
+          <div class="co-item-mini-price">₹${p.price * item.qty}</div>
+        </div>`;
+      }).join('');
+    }
 
     const zone = document.getElementById('ship-zone').value;
     const shipping = calcShipping(zone, totalKg);

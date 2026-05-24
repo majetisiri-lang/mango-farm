@@ -65,42 +65,30 @@
 <div class="cart-layout" id="cart-content">
 
   <!-- CART ITEMS -->
-  <div>
-    <div id="cart-items-container"></div>
-  </div>
+  <div class="checkout-section" id="cart-items-container"></div>
 
-  <!-- ORDER SUMMARY -->
-  <div>
-    <div class="order-summary" id="order-summary-panel">
-      <h3>Order Summary</h3>
-      <div id="min-order-warning" style="display:none; background:#fff3e0; border:1px solid #ffb74d; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:.85rem; color:#e65100;">
-        ⚠️ Minimum order is <strong>5 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
-      </div>
-      <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
-      <div class="summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
-      <div class="summary-row" id="discount-row" style="display:none;color:var(--green);font-weight:600;"><span id="discount-label">Discount</span><span id="sum-discount"></span></div>
-      <div class="summary-row total"><span>Total</span><span id="sum-total">₹0</span></div>
-
-      <!-- COUPON CODE -->
-      <div style="margin: 16px 0 4px;">
-        <div style="display:flex;gap:8px;">
-          <input type="text" id="coupon-input" placeholder="Coupon code" oninput="this.value=this.value.toUpperCase()"
-            style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-size:.88rem;font-family:inherit;">
-          <button onclick="applyCoupon()" class="btn btn-outline" style="padding:9px 14px;font-size:.88rem;border-radius:10px;">Apply</button>
-        </div>
-        <div id="coupon-msg" style="font-size:.8rem;margin-top:6px;"></div>
-      </div>
-
-      <hr class="divider">
-
-      <!-- SHIPPING ADDRESS -->
-      <div class="payment-title">📦 Delivery Address</div>
+  <!-- DELIVERY DETAILS -->
+  <div class="checkout-section checkout-card">
+    <div class="checkout-section-title">📦 Delivery Details</div>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="ship-name" placeholder="Your full name" oninput="validateForm()">
+    </div>
+    <div class="form-group">
+      <label>Delivery Method</label>
+      <select id="ship-zone" onchange="updateSummary(); validateForm()">
+        <option value="">Select delivery method...</option>
+        <option value="pickup">Pickup from Farm (Free) — Narsapur, Andhra Pradesh</option>
+        <option value="ap">Andhra Pradesh — ₹60/kg</option>
+        <option value="south">South India (TN, KA, TG, KL) — ₹80/kg</option>
+      </select>
+    </div>
+    <div id="pickup-notice" style="display:none;background:#f0faf4;border:1px solid #b2dfcb;border-radius:10px;padding:10px 14px;font-size:.85rem;color:#1a5c36;margin-bottom:4px;">
+      🏡 You've selected farm pickup. Collect your order from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge applies.
+    </div>
+    <div id="address-fields">
       <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" id="ship-name" placeholder="Your full name" oninput="validateForm()">
-      </div>
-      <div class="form-group">
-        <label>Address</label>
+        <label>Street Address</label>
         <input type="text" id="ship-address" placeholder="Street address" oninput="validateForm()">
       </div>
       <div class="form-row">
@@ -110,7 +98,7 @@
           <div id="city-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ We currently ship within India only.</div>
         </div>
         <div class="form-group">
-          <label>Postcode</label>
+          <label>PIN Code</label>
           <input type="text" id="ship-zip" placeholder="PIN Code" maxlength="6" oninput="autofillZone(); validateForm()">
           <div id="pin-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 6-digit Indian PIN code.</div>
         </div>
@@ -134,66 +122,56 @@
           <option>Ladakh</option><option>Lakshadweep</option><option>Puducherry</option>
         </select>
       </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <div style="display:flex;gap:8px;">
-          <input type="tel" id="ship-phone" placeholder="+91 00000 00000" oninput="validatePhone(); validateForm()" style="flex:1;">
-          <button type="button" id="otp-send-btn" onclick="sendPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;white-space:nowrap;">Send OTP</button>
-        </div>
-        <div id="phone-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 10-digit Indian mobile number.</div>
-        <div id="otp-section" style="display:none;margin-top:10px;">
-          <div style="display:flex;gap:8px;">
-            <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-family:inherit;">
-            <button type="button" onclick="verifyPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;">Verify</button>
-          </div>
-          <div id="otp-msg" style="font-size:.8rem;margin-top:6px;"></div>
-        </div>
-        <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
-      </div>
-      <div class="form-group">
-        <label>Delivery Method</label>
-        <select id="ship-zone" onchange="updateSummary(); validateForm()">
-          <option value="">Select delivery method...</option>
-          <option value="pickup">Pickup from Farm (Free) — Narsapur, Andhra Pradesh</option>
-          <option value="ap">Andhra Pradesh — ₹60/kg</option>
-          <option value="south">South India (TN, KA, TG, KL) — ₹80/kg</option>
-        </select>
-      </div>
-      <div id="pickup-notice" style="display:none;background:#f0faf4;border:1px solid #b2dfcb;border-radius:10px;padding:10px 14px;font-size:.85rem;color:#1a5c36;margin-bottom:4px;">
-        🏡 You've selected farm pickup. Collect your order from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge applies.
-      </div>
-      <div id="shipping-breakdown" style="background:#f9f5eb;border-radius:8px;padding:10px 14px;font-size:.82rem;color:#666;margin-bottom:4px;display:none;"></div>
-
-      <hr class="divider">
-
-      <!-- PAYMENT OPTIONS -->
-      <div class="payment-title">💳 Payment Method</div>
-      <div class="payment-options">
-
-        <label class="payment-option selected" id="opt-online">
-          <input type="radio" name="payment" value="online" checked onchange="selectPayment('online')">
-          <div class="payment-option-icon">💳</div>
-          <div class="payment-option-label">
-            <div class="payment-option-name">Pay Online</div>
-            <div class="payment-option-desc">Card, UPI, Net Banking, Wallets</div>
-          </div>
-        </label>
-
-      </div>
-
-      <!-- ONLINE PAYMENT NOTICE -->
-      <div class="card-form show" id="online-form">
-        <p style="font-size:.85rem;color:#555;text-align:center;">
-          A secure Razorpay payment window will open. Pay by card, UPI, net banking, or wallet.
-        </p>
-      </div>
-
-      <button class="btn btn-green checkout-btn" onclick="placeOrder()">
-        Place Order &nbsp;→
-      </button>
-      <div id="form-hints" style="font-size:.8rem;color:#e53935;margin-top:8px;line-height:1.6;display:none;"></div>
-      <p class="secure-note">🔒 Secured with 256-bit SSL encryption</p>
     </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <div style="display:flex;gap:8px;">
+        <input type="tel" id="ship-phone" placeholder="+91 00000 00000" oninput="validatePhone(); validateForm()" style="flex:1;">
+        <button type="button" id="otp-send-btn" onclick="sendPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;white-space:nowrap;">Send OTP</button>
+      </div>
+      <div id="phone-error" style="color:#e53935;font-size:.78rem;margin-top:4px;display:none;">⚠️ Please enter a valid 10-digit Indian mobile number.</div>
+      <div id="otp-section" style="display:none;margin-top:10px;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="otp-input" placeholder="Enter 6-digit OTP" maxlength="6" style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-family:inherit;">
+          <button type="button" onclick="verifyPhoneOtp()" class="btn btn-outline" style="padding:9px 12px;font-size:.85rem;border-radius:10px;">Verify</button>
+        </div>
+        <div id="otp-msg" style="font-size:.8rem;margin-top:6px;"></div>
+      </div>
+      <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
+    </div>
+    <div id="shipping-breakdown" style="background:#f9f5eb;border-radius:10px;padding:10px 14px;font-size:.82rem;color:#666;margin-top:4px;display:none;"></div>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div class="checkout-section checkout-card" id="order-summary-panel">
+    <div class="checkout-section-title">🧾 Order Summary</div>
+    <div id="min-order-warning" style="display:none; background:#fff3e0; border:1px solid #ffb74d; border-radius:8px; padding:12px 14px; margin-bottom:16px; font-size:.85rem; color:#e65100;">
+      ⚠️ Minimum order is <strong>5 kg</strong>. You currently have <strong id="current-kg">0 kg</strong>. Please add more to checkout.
+    </div>
+    <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
+    <div class="summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
+    <div class="summary-row" id="discount-row" style="display:none;color:var(--green);font-weight:600;"><span id="discount-label">Discount</span><span id="sum-discount"></span></div>
+    <div class="summary-row total"><span>Total</span><span id="sum-total">₹0</span></div>
+    <div style="margin-top:16px;">
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="coupon-input" placeholder="Coupon code" oninput="this.value=this.value.toUpperCase()"
+          style="flex:1;border:1px solid #e0e0e0;border-radius:10px;padding:9px 12px;font-size:.88rem;font-family:inherit;">
+        <button onclick="applyCoupon()" class="btn btn-outline" style="padding:9px 14px;font-size:.88rem;border-radius:10px;">Apply</button>
+      </div>
+      <div id="coupon-msg" style="font-size:.8rem;margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <!-- PLACE ORDER -->
+  <div class="checkout-section checkout-card" style="text-align:center;">
+    <p style="font-size:.85rem;color:#555;margin-bottom:16px;">
+      🔐 A secure Razorpay payment window will open. Pay by card, UPI, net banking, or wallet.
+    </p>
+    <button class="btn btn-green checkout-btn" onclick="placeOrder()" style="width:100%;font-size:1.05rem;padding:14px;">
+      Place Order &nbsp;→
+    </button>
+    <div id="form-hints" style="font-size:.8rem;color:#e53935;margin-top:12px;line-height:1.8;display:none;text-align:left;"></div>
+    <p class="secure-note">🔒 Secured with 256-bit SSL encryption</p>
   </div>
 
 </div>
@@ -327,6 +305,7 @@
 
     const isPickup = zone === 'pickup';
     document.getElementById('pickup-notice').style.display = isPickup ? 'block' : 'none';
+    document.getElementById('address-fields').style.display = isPickup ? 'none' : 'block';
 
     const breakdown = document.getElementById('shipping-breakdown');
     if (zone && !isPickup) {

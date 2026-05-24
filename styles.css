@@ -367,7 +367,10 @@ footer {
 .sort-select { border: 1px solid var(--border); border-radius: 10px; padding: 9px 14px; font-size: .875rem; font-family: var(--font); cursor: pointer; background: var(--white); color: var(--text); }
 
 /* ===== CART ===== */
-.cart-layout { display: grid; grid-template-columns: 1fr 380px; gap: 32px; padding: 40px 5%; }
+.cart-layout { display: flex; flex-direction: column; gap: 20px; padding: 32px 5%; max-width: 720px; margin: 0 auto; }
+.checkout-section {}
+.checkout-card { background: var(--white); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); border: 1px solid var(--border); }
+.checkout-section-title { font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 20px; letter-spacing: -.01em; }
 .cart-item {
   background: var(--white); border-radius: var(--radius); padding: 20px;
   display: flex; gap: 20px; align-items: center; margin-bottom: 14px;
@@ -384,11 +387,7 @@ footer {
 .cart-item-price { font-size: 1.2rem; font-weight: 800; color: var(--green); letter-spacing: -.02em; }
 .remove-btn { background: none; border: none; cursor: pointer; color: #d1d5db; font-size: 1.2rem; margin-left: 8px; transition: color .2s; }
 .remove-btn:hover { color: var(--orange); }
-.order-summary {
-  background: var(--white); border-radius: var(--radius);
-  padding: 28px; box-shadow: var(--shadow); height: fit-content;
-  position: sticky; top: 80px; border: 1px solid var(--border);
-}
+.order-summary { background: var(--white); border-radius: var(--radius); padding: 28px; box-shadow: var(--shadow); border: 1px solid var(--border); }
 .order-summary h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 24px; color: var(--text); letter-spacing: -.01em; }
 .summary-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: .93rem; }
 .summary-row.total { font-weight: 800; font-size: 1.1rem; border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px; color: var(--green); }
@@ -483,7 +482,7 @@ footer {
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .shop-layout { grid-template-columns: 1fr; }
   .filters { display: none; }
-  .cart-layout { grid-template-columns: 1fr; }
+  .cart-layout { padding: 20px 4%; }
   .contact-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 600px) {

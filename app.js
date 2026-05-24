@@ -115,7 +115,7 @@ function renderProductCard(product) {
         </div>`
       : `<div>
           <div class="product-price">₹${product.price} <span>/ ${product.size}</span></div>
-          <div style="font-size:.72rem;color:#888;margin-top:2px;">per kg · excl. shipping</div>
+          <div style="font-size:.72rem;color:#888;margin-top:2px;">min 5 kg · excl. shipping</div>
         </div>
         <button class="add-to-cart" onclick="addToCart(${product.id})" title="Add to cart">+</button>`;
 
@@ -127,7 +127,7 @@ function renderProductCard(product) {
       </div>
       <div class="product-body">
         <div class="product-name">${product.name}</div>
-        ${qty > 0 && !product.soldOut ? `<div class="product-price" style="margin-bottom:2px;">₹${product.price} <span>/ ${product.size}</span></div><div style="font-size:.72rem;color:#888;margin-bottom:8px;">per kg · excl. shipping</div>` : ''}
+        ${qty > 0 && !product.soldOut ? `<div class="product-price" style="margin-bottom:2px;">₹${product.price} <span>/ ${product.size}</span></div><div style="font-size:.72rem;color:#888;margin-bottom:8px;">min 5 kg · excl. shipping</div>` : ''}
         <div class="product-footer">${footer}</div>
       </div>
     </div>`;

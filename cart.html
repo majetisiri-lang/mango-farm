@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Cart & Checkout - Godavari Mangoes</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvJn951Nsi8r4bTEOxV2FeLCLn6ouB5ig&libraries=places"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script>
@@ -835,6 +836,39 @@
       btn.textContent = 'Place Order  →';
     }
   }
+
+  // Google Places Autocomplete on address field
+  function initAddressAutocomplete() {
+    const input = document.getElementById('ship-address');
+    if (!input || typeof google === 'undefined') return;
+    const ac = new google.maps.places.Autocomplete(input, {
+      componentRestrictions: { country: 'in' },
+      fields: ['address_components', 'formatted_address'],
+    });
+    ac.addListener('place_changed', () => {
+      const place = ac.getPlace();
+      if (!place.address_components) return;
+      let streetNumber = '', route = '', city = '', state = '', pin = '';
+      for (const c of place.address_components) {
+        const t = c.types;
+        if (t.includes('street_number'))               streetNumber = c.long_name;
+        if (t.includes('route'))                       route = c.long_name;
+        if (t.includes('locality'))                    city = c.long_name;
+        if (t.includes('sublocality_level_1') && !city) city = c.long_name;
+        if (t.includes('administrative_area_level_1')) state = c.long_name;
+        if (t.includes('postal_code'))                 pin = c.long_name;
+      }
+      input.value = [streetNumber, route].filter(Boolean).join(' ') || place.formatted_address;
+      if (city)  document.getElementById('ship-city').value = city;
+      if (state) document.getElementById('ship-state').value = state;
+      if (pin) {
+        document.getElementById('ship-zip').value = pin;
+        autofillZone();
+      }
+      validateForm();
+    });
+  }
+  initAddressAutocomplete();
 
   renderCartPage();
   validateForm();

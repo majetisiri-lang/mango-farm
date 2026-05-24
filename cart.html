@@ -141,29 +141,39 @@
         <div class="co-step-title">Delivery Method</div>
       </div>
       <div class="co-delivery-options">
+        <!-- Auto-shown based on PIN — hidden by default -->
+        <label class="co-delivery-opt" id="zone-opt-ap" style="display:none;">
+          <input type="radio" name="zone" value="ap" onchange="setDeliveryZone('ap')">
+          <div class="co-delivery-opt-body">
+            <div class="co-delivery-opt-name">🚚 Andhra Pradesh — Door Delivery</div>
+            <div class="co-delivery-opt-desc">Via DTDC · 1–2 days</div>
+          </div>
+          <div class="co-delivery-opt-price">₹60/kg</div>
+        </label>
+        <label class="co-delivery-opt" id="zone-opt-south" style="display:none;">
+          <input type="radio" name="zone" value="south" onchange="setDeliveryZone('south')">
+          <div class="co-delivery-opt-body">
+            <div class="co-delivery-opt-name">🚚 South India — Door Delivery</div>
+            <div class="co-delivery-opt-desc">TN, KA, TG, KL · Via DTDC · 2–3 days</div>
+          </div>
+          <div class="co-delivery-opt-price">₹80/kg</div>
+        </label>
+        <!-- Always visible -->
         <label class="co-delivery-opt" id="zone-opt-pickup">
           <input type="radio" name="zone" value="pickup" onchange="setDeliveryZone('pickup')">
           <div class="co-delivery-opt-body">
             <div class="co-delivery-opt-name">🏡 Farm Pickup</div>
-            <div class="co-delivery-opt-desc">Collect from Narsapur, Andhra Pradesh</div>
+            <div class="co-delivery-opt-desc">Collect from our farm in Narsapur — contact us to arrange</div>
           </div>
           <div class="co-delivery-opt-price free">FREE</div>
         </label>
-        <label class="co-delivery-opt" id="zone-opt-ap">
-          <input type="radio" name="zone" value="ap" onchange="setDeliveryZone('ap')">
+        <label class="co-delivery-opt" id="zone-opt-anl">
+          <input type="radio" name="zone" value="anl" onchange="setDeliveryZone('anl')">
           <div class="co-delivery-opt-body">
-            <div class="co-delivery-opt-name">🚚 Andhra Pradesh</div>
-            <div class="co-delivery-opt-desc">Door delivery via DTDC</div>
+            <div class="co-delivery-opt-name">💰 Cheaper Option (ANL / Navitha)</div>
+            <div class="co-delivery-opt-desc">Branch pickup only · No door delivery · contact us to arrange</div>
           </div>
-          <div class="co-delivery-opt-price">₹60/kg</div>
-        </label>
-        <label class="co-delivery-opt" id="zone-opt-south">
-          <input type="radio" name="zone" value="south" onchange="setDeliveryZone('south')">
-          <div class="co-delivery-opt-body">
-            <div class="co-delivery-opt-name">🚚 South India</div>
-            <div class="co-delivery-opt-desc">TN, KA, TG, KL — Door delivery via DTDC</div>
-          </div>
-          <div class="co-delivery-opt-price">₹80/kg</div>
+          <div class="co-delivery-opt-price" style="color:var(--text-light);font-size:.8rem;">Contact us</div>
         </label>
       </div>
       <select id="ship-zone" onchange="updateSummary(); validateForm()" style="display:none;">
@@ -171,12 +181,13 @@
         <option value="pickup">pickup</option>
         <option value="ap">ap</option>
         <option value="south">south</option>
+        <option value="anl">anl</option>
       </select>
-      <div id="pickup-notice" style="display:none;background:#f0faf4;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#1a5c36;margin-top:10px;">
-        🏡 Collect from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge.
+      <div id="contact-required-notice" style="display:none;background:#fff3e0;border:1px solid #ffb74d;border-radius:10px;padding:14px 16px;margin-top:12px;">
+        <div style="font-weight:700;font-size:.9rem;color:#e65100;margin-bottom:4px;">📞 Please call us to arrange this</div>
+        <div style="font-size:.85rem;color:#555;">Call or WhatsApp: <a href="tel:+919948620456" style="font-weight:700;color:var(--green);">+91 99486 20456</a> and we'll confirm your order over the phone.</div>
       </div>
       <div id="shipping-breakdown" style="font-size:.82rem;color:#555;margin-top:10px;display:none;"></div>
-      <p style="font-size:.75rem;color:#999;margin-top:12px;line-height:1.6;">Need a cheaper option? We also ship via <strong>ANL</strong> or <strong>Navitha</strong> (branch pickup). <a href="contact.html" style="color:var(--green);">Contact us</a> to arrange.</p>
     </div>
 
   </div>
@@ -363,8 +374,7 @@
 
     document.getElementById('sum-total').textContent = zone ? `₹${total}` : '—';
 
-    const isPickup = zone === 'pickup';
-    document.getElementById('pickup-notice').style.display = isPickup ? 'block' : 'none';
+    const isPickup = zone === 'pickup' || zone === 'anl';
     document.getElementById('address-fields').style.display = isPickup ? 'none' : 'block';
 
     const breakdown = document.getElementById('shipping-breakdown');
@@ -532,6 +542,12 @@
     document.querySelectorAll('input[name="zone"]').forEach(r => {
       r.checked = (r.value === zone);
     });
+    // Show only the matched courier option, hide the other
+    document.getElementById('zone-opt-ap').style.display = (zone === 'ap') ? '' : 'none';
+    document.getElementById('zone-opt-south').style.display = (zone === 'south') ? '' : 'none';
+    // Contact-only notice for pickup / ANL
+    const isContactOnly = zone === 'pickup' || zone === 'anl';
+    document.getElementById('contact-required-notice').style.display = isContactOnly ? 'block' : 'none';
     updateSummary();
     validateForm();
   }
@@ -560,7 +576,8 @@
     else if (p >= 600 && p <= 643) zone = 'south';                  // Tamil Nadu
     else if (p >= 670 && p <= 695) zone = 'south';                  // Kerala
     else zone = 'south';                                             // Default to South India
-    if (document.getElementById('ship-zone').value === 'pickup') return;
+    const cur = document.getElementById('ship-zone').value;
+    if (cur === 'pickup' || cur === 'anl') return;
     setDeliveryZone(zone);
   }
 
@@ -576,11 +593,12 @@
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     const pinValid = TEST_PINS.includes(zip) || (/^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8);
     const cityNonIndian = city && (/,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase()));
-    const isPickup = zone === 'pickup';
+    const isContactOnly = zone === 'pickup' || zone === 'anl';
+    const isPickup = isContactOnly;
     const phoneVerifiedOk = phoneVerified && lastVerifiedPhone === phone;
     const totalKg = getTotalKg(getCart());
     const addressValid = isPickup || (address && city && !cityNonIndian && pinValid && state);
-    const allValid = name && addressValid && phoneValid && phoneVerifiedOk && zone && totalKg >= MIN_KG;
+    const allValid = name && addressValid && phoneValid && phoneVerifiedOk && zone && totalKg >= MIN_KG && !isContactOnly;
     const btn = document.querySelector('.checkout-btn');
     if (btn) {
       btn.disabled = !allValid;
@@ -604,6 +622,7 @@
           if (!state) hints.push('Please select a state');
         }
         if (!zone) hints.push('Please select a delivery method');
+        if (isContactOnly) hints.push('For Farm Pickup or cheaper delivery, please call +91 99486 20456 to place your order');
         if (!phone) hints.push('Phone number is required');
         else if (!phoneValid) hints.push('Enter a valid Indian mobile number');
         else if (!phoneVerifiedOk) hints.push('Please verify your phone number with OTP');

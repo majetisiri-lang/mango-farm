@@ -454,7 +454,7 @@
       if (data.ok) {
         document.getElementById('otp-section').style.display = 'block';
         document.getElementById('otp-msg').style.color = 'var(--green)';
-        document.getElementById('otp-msg').textContent = `OTP sent to ${phone}`;
+        document.getElementById('otp-msg').textContent = data.testOtp ? `Test OTP: ${data.testOtp}` : `OTP sent to ${phone}`;
         btn.textContent = 'Resend OTP';
         phoneVerified = false;
         lastVerifiedPhone = '';

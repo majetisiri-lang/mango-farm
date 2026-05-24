@@ -552,6 +552,45 @@
     validateForm();
   }
 
+  function getStateFromPin(pin) {
+    const p = parseInt(pin.substring(0, 3));
+    if (p >= 110 && p <= 119) return 'Delhi';
+    if (p >= 121 && p <= 136) return 'Haryana';
+    if (p === 160) return 'Chandigarh';
+    if (p >= 140 && p <= 159) return 'Punjab';
+    if (p >= 170 && p <= 177) return 'Himachal Pradesh';
+    if (p >= 180 && p <= 195) return 'Jammu and Kashmir';
+    if (p >= 196 && p <= 199) return 'Ladakh';
+    if (p >= 244 && p <= 263) return 'Uttarakhand';
+    if (p >= 200 && p <= 285) return 'Uttar Pradesh';
+    if (p >= 301 && p <= 345) return 'Rajasthan';
+    if (p === 403) return 'Goa';
+    if (p >= 360 && p <= 396) return 'Gujarat';
+    if (p >= 400 && p <= 445) return 'Maharashtra';
+    if (p >= 446 && p <= 488) return 'Madhya Pradesh';
+    if (p >= 490 && p <= 497) return 'Chhattisgarh';
+    if ((p >= 500 && p <= 509) || p === 536) return 'Telangana';
+    if (p >= 515 && p <= 535) return 'Andhra Pradesh';
+    if (p >= 537 && p <= 559) return 'Andhra Pradesh';
+    if (p >= 560 && p <= 591) return 'Karnataka';
+    if (p >= 600 && p <= 643) return 'Tamil Nadu';
+    if (p >= 670 && p <= 695) return 'Kerala';
+    if (p === 737) return 'Sikkim';
+    if (p >= 700 && p <= 743) return 'West Bengal';
+    if (p === 744) return 'Andaman and Nicobar Islands';
+    if (p >= 751 && p <= 770) return 'Odisha';
+    if (p >= 781 && p <= 788) return 'Assam';
+    if (p >= 790 && p <= 792) return 'Arunachal Pradesh';
+    if (p >= 793 && p <= 794) return 'Meghalaya';
+    if (p === 795) return 'Manipur';
+    if (p === 796) return 'Mizoram';
+    if (p >= 797 && p <= 798) return 'Nagaland';
+    if (p === 799) return 'Tripura';
+    if (p >= 814 && p <= 835) return 'Jharkhand';
+    if (p >= 800 && p <= 855) return 'Bihar';
+    return '';
+  }
+
   function autofillZone() {
     const pin = document.getElementById('ship-zip').value.trim();
     const pinError = document.getElementById('pin-error');
@@ -570,12 +609,21 @@
     pinError.style.display = 'none';
     const p = parseInt(pin.substring(0, 3));
     let zone = '';
-    if (p >= 515 && p <= 535) zone = 'ap';                          // Andhra Pradesh
-    else if ((p >= 500 && p <= 514) || p === 536) zone = 'south';   // Telangana
-    else if (p >= 560 && p <= 577) zone = 'south';                  // Karnataka
-    else if (p >= 600 && p <= 643) zone = 'south';                  // Tamil Nadu
-    else if (p >= 670 && p <= 695) zone = 'south';                  // Kerala
-    else zone = 'south';                                             // Default to South India
+    if (p >= 515 && p <= 535) zone = 'ap';
+    else if ((p >= 500 && p <= 514) || p === 536) zone = 'south';
+    else if (p >= 537 && p <= 559) zone = 'south';
+    else if (p >= 560 && p <= 591) zone = 'south';
+    else if (p >= 600 && p <= 643) zone = 'south';
+    else if (p >= 670 && p <= 695) zone = 'south';
+    else zone = 'south';
+
+    // Auto-fill state
+    const state = getStateFromPin(pin);
+    if (state) {
+      const stateEl = document.getElementById('ship-state');
+      if (stateEl && !stateEl.value) stateEl.value = state;
+    }
+
     const cur = document.getElementById('ship-zone').value;
     if (cur === 'pickup' || cur === 'anl') return;
     setDeliveryZone(zone);

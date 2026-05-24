@@ -12,7 +12,7 @@ const products = [
   { id: 7,  name: 'Imam Pasandh',       category: 'kotha-kayalu', origin: 'Narsapur, Andhra Pradesh', desc: 'A premium variety with smooth fibreless pulp and a rich, honeyed sweetness. A true connoisseur\'s mango.', price: 150, size: '1 kg box', badge: null, soldOut: true, images: ['images/products/imam-pasandh-1.jpg','images/products/imam-pasandh-2.jpg','images/products/imam-pasandh-3.jpeg','images/products/imam-pasandh-4.jpeg'] },
   { id: 8,  name: 'Banginpalli',         category: 'kotha-kayalu', origin: 'Narsapur, Andhra Pradesh', desc: 'GI-tagged variety with golden-yellow skin, fibreless pulp, and a mild sweet taste. Perfect for eating fresh.', price: 60, size: '1 kg box', badge: null, images: ['images/products/banginpalli-1.jpg','images/products/banginpalli-2.jpeg'] },
   { id: 11, name: 'Kesar',               category: 'kotha-kayalu', origin: 'Narsapur, Andhra Pradesh', desc: 'The "Queen of Mangoes" — saffron-coloured pulp with an intense honey-like sweetness and a distinctive floral aroma.', price: 150, size: '1 kg box', badge: null, soldOut: true, images: ['images/products/kesar-1.jpeg','images/products/kesar-2.jpeg','images/products/kesar-3.jpeg','images/products/kesar-4.jpg'] },
-  { id: 12, name: 'Cover Banginpalli',   category: 'kotha-kayalu', origin: 'Narsapur, Andhra Pradesh', desc: 'Our most sought-after variety — each mango individually hand-covered for flawless ripening. Rich, creamy, and perfectly sweet.', price: 70, size: '1 kg box', badge: '⭐ Best Seller', images: ['images/products/cover-banginpalli-1.jpeg','images/banginpalli.jpg','images/gallery/IMG_20260430_113701235.jpg','images/gallery/IMG_20260430_162426386.jpg','images/gallery/IMG_20260430_162622811.jpg','images/gallery/IMG_20260430_114529068_MF_PORTRAIT.jpg'] },
+  { id: 12, name: 'Cover Banginpalli',   category: 'kotha-kayalu', origin: 'Narsapur, Andhra Pradesh', desc: 'Our most sought-after variety — each mango individually hand-covered for flawless ripening. Rich, creamy, and perfectly sweet.', price: 70, size: '1 kg box', badge: '⭐ Best Seller', tag: 'Premium', images: ['images/products/cover-banginpalli-1.jpeg','images/banginpalli.jpg','images/gallery/IMG_20260430_113701235.jpg','images/gallery/IMG_20260430_162426386.jpg','images/gallery/IMG_20260430_162622811.jpg','images/gallery/IMG_20260430_114529068_MF_PORTRAIT.jpg'] },
 ];
 
 // ===== CART HELPERS =====
@@ -105,6 +105,7 @@ function renderProductCard(product) {
       <div class="product-img">
         ${renderProductSlideshow(product)}
         ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+        ${product.tag ? `<div class="product-tag">${product.tag}</div>` : ''}
       </div>
       <div class="product-body">
         <div class="product-name">${product.name}</div>

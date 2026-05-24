@@ -430,6 +430,7 @@
     showToast('Item removed from cart');
   }
 
+  let detectedZone = '';
   let phoneVerified = false;
   let lastVerifiedPhone = '';
   const TEST_PHONES = ['7576852052', '3108691650'];
@@ -542,9 +543,9 @@
     document.querySelectorAll('input[name="zone"]').forEach(r => {
       r.checked = (r.value === zone);
     });
-    // Show only the matched courier option, hide the other
-    document.getElementById('zone-opt-ap').style.display = (zone === 'ap') ? '' : 'none';
-    document.getElementById('zone-opt-south').style.display = (zone === 'south') ? '' : 'none';
+    // Keep detected courier zone always visible; hide only the undetected one
+    document.getElementById('zone-opt-ap').style.display = (detectedZone === 'ap' || zone === 'ap') ? '' : 'none';
+    document.getElementById('zone-opt-south').style.display = (detectedZone === 'south' || zone === 'south') ? '' : 'none';
     // Contact-only notice for pickup / ANL
     const isContactOnly = zone === 'pickup' || zone === 'anl';
     document.getElementById('contact-required-notice').style.display = isContactOnly ? 'block' : 'none';
@@ -624,6 +625,7 @@
       if (stateEl && !stateEl.value) stateEl.value = state;
     }
 
+    detectedZone = zone;
     const cur = document.getElementById('ship-zone').value;
     if (cur === 'pickup' || cur === 'anl') return;
     setDeliveryZone(zone);

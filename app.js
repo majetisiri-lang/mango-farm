@@ -40,6 +40,7 @@ function addToCart(productId) {
   }
   saveCart(cart);
   updateCartCount();
+  if (typeof window.refreshProductCards === 'function') window.refreshProductCards();
   const product = products.find(p => p.id === productId);
   showToast(`🥭 ${product.name} added to cart!`);
 }
@@ -100,6 +101,24 @@ setInterval(() => {
 
 // ===== RENDER PRODUCT CARD =====
 function renderProductCard(product) {
+  const cart = getCart();
+  const cartItem = cart.find(i => i.id === product.id);
+  const qty = cartItem ? cartItem.qty : 0;
+
+  const footer = product.soldOut
+    ? `<div class="product-sold-out">Sold Out</div>`
+    : qty > 0
+      ? `<div class="card-qty-control">
+          <button class="card-qty-btn" onclick="changeQtyCard(${product.id}, -1)">−</button>
+          <span class="card-qty-val">${qty} kg</span>
+          <button class="card-qty-btn" onclick="changeQtyCard(${product.id}, 1)">+</button>
+        </div>`
+      : `<div>
+          <div class="product-price">₹${product.price} <span>/ ${product.size}</span></div>
+          <div style="font-size:.72rem;color:#888;margin-top:2px;">Min. 5 kg · Shipping price varies</div>
+        </div>
+        <button class="add-to-cart" onclick="addToCart(${product.id})" title="Add to cart">+</button>`;
+
   return `
     <div class="product-card">
       <div class="product-img">
@@ -108,17 +127,22 @@ function renderProductCard(product) {
       </div>
       <div class="product-body">
         <div class="product-name">${product.name}</div>
-        <div class="product-footer">
-          ${product.soldOut
-            ? `<div class="product-sold-out">Sold Out</div>`
-            : `<div>
-              <div class="product-price">₹${product.price} <span>/ ${product.size}</span></div>
-              <div style="font-size:.72rem;color:#888;margin-top:2px;">Min. 5 kg · Shipping price varies</div>
-            </div>
-          <button class="add-to-cart" onclick="addToCart(${product.id})" title="Add to cart">+</button>`}
-        </div>
+        ${qty > 0 && !product.soldOut ? `<div class="product-price" style="margin-bottom:8px;">₹${product.price} <span>/ ${product.size}</span></div>` : ''}
+        <div class="product-footer">${footer}</div>
       </div>
     </div>`;
+}
+
+function changeQtyCard(id, delta) {
+  const cart = getCart();
+  const idx = cart.findIndex(i => i.id === id);
+  if (idx === -1) return;
+  const newQty = cart[idx].qty + delta;
+  if (newQty < 5) { showToast('Minimum 5 kg per item'); return; }
+  cart[idx].qty = newQty;
+  saveCart(cart);
+  updateCartCount();
+  if (typeof window.refreshProductCards === 'function') window.refreshProductCards();
 }
 
 // ===== NAV DRAWER =====

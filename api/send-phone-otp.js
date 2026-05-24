@@ -36,8 +36,9 @@ module.exports = async (req, res) => {
 
   const data = await response.json();
   if (!data.return) {
-    console.error('Fast2SMS error:', data);
-    return res.status(500).json({ error: 'Failed to send OTP' });
+    console.error('Fast2SMS error:', JSON.stringify(data));
+    const msg = (data.message && data.message[0]) || JSON.stringify(data);
+    return res.status(500).json({ error: msg });
   }
 
   res.status(200).json({ ok: true });

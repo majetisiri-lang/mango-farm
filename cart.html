@@ -135,7 +135,7 @@
     </div>
 
     <!-- STEP 3: DELIVERY METHOD -->
-    <div class="co-card">
+    <div class="co-card" id="delivery-method-card" style="display:none;">
       <div class="co-step-header">
         <div class="co-step-num">3</div>
         <div class="co-step-title">Delivery Method</div>
@@ -163,7 +163,7 @@
           <input type="radio" name="zone" value="pickup" onchange="setDeliveryZone('pickup')">
           <div class="co-delivery-opt-body">
             <div class="co-delivery-opt-name">🏡 Farm Pickup</div>
-            <div class="co-delivery-opt-desc">Collect from our farm in Narsapur — contact us to arrange</div>
+            <div class="co-delivery-opt-desc">Collect from our farm in Narsapur — free, contact us to arrange</div>
           </div>
           <div class="co-delivery-opt-price free">FREE</div>
         </label>
@@ -589,6 +589,12 @@
     const phone = document.getElementById('ship-phone').value.trim();
     const state = document.getElementById('ship-state').value;
     const zone = document.getElementById('ship-zone').value;
+
+    // Show delivery method card only after address is filled
+    const deliveryCard = document.getElementById('delivery-method-card');
+    if (deliveryCard) {
+      deliveryCard.style.display = (address && city && state) ? '' : 'none';
+    }
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
     const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits) || isTestPhone(phone);
     const pinValid = TEST_PINS.includes(zip) || (/^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8);

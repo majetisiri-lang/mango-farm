@@ -6,6 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Cart & Checkout - Godavari Mangoes</title>
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyD-RvDqMjwm7l-BA_4HMYX38omNw5Lfd-E",
+      authDomain: "godavari-mangoes.firebaseapp.com",
+      projectId: "godavari-mangoes",
+      messagingSenderId: "100859823488",
+      appId: "1:100859823488:web:6a94a7a54afdbc1540ad65"
+    });
+  </script>
 </head>
 <body>
 
@@ -435,6 +446,10 @@
   let lastVerifiedPhone = '';
   const TEST_PINS = ['000000'];
 
+  const TEST_PHONES = ['7576852052', '3108691650'];
+
+  function isTestPhone(digits) { return TEST_PHONES.includes(digits); }
+
   async function sendPhoneOtp() {
     const phone = document.getElementById('ship-phone').value.trim();
     const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
@@ -444,29 +459,49 @@
     }
     const btn = document.getElementById('otp-send-btn');
     btn.disabled = true; btn.textContent = 'Sending...';
+
+    // Test phone: use server-side fixed OTP
+    if (isTestPhone(digits)) {
+      try {
+        const res = await fetch('/api/send-phone-otp', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById('otp-section').style.display = 'block';
+          document.getElementById('otp-msg').style.color = 'var(--green)';
+          document.getElementById('otp-msg').textContent = `Test OTP: ${data.testOtp}`;
+          btn.textContent = 'Resend OTP';
+          phoneVerified = false; lastVerifiedPhone = '';
+          document.getElementById('phone-verified-msg').style.display = 'none';
+          validateForm();
+        } else { showToast(data.error || 'Failed'); btn.textContent = 'Send OTP'; }
+      } catch(e) { showToast('Failed. Try again.'); btn.textContent = 'Send OTP'; }
+      btn.disabled = false;
+      return;
+    }
+
+    // Real number: Firebase Phone Auth
     try {
-      const res = await fetch('/api/send-phone-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        document.getElementById('otp-section').style.display = 'block';
-        document.getElementById('otp-msg').style.color = 'var(--green)';
-        document.getElementById('otp-msg').textContent = data.testOtp ? `Test OTP: ${data.testOtp}` : `OTP sent to ${phone}`;
-        btn.textContent = 'Resend OTP';
-        phoneVerified = false;
-        lastVerifiedPhone = '';
-        document.getElementById('phone-verified-msg').style.display = 'none';
-        validateForm();
-      } else {
-        showToast(data.error || 'Failed to send OTP');
-        btn.textContent = 'Send OTP';
+      if (window.recaptchaVerifier) {
+        try { window.recaptchaVerifier.clear(); } catch(e) {}
       }
+      window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('otp-send-btn', { size: 'invisible' });
+      const confirmation = await firebase.auth().signInWithPhoneNumber('+91' + digits, window.recaptchaVerifier);
+      window.firebaseConfirmation = confirmation;
+      document.getElementById('otp-section').style.display = 'block';
+      document.getElementById('otp-msg').style.color = 'var(--green)';
+      document.getElementById('otp-msg').textContent = `OTP sent to ${phone}`;
+      btn.textContent = 'Resend OTP';
+      phoneVerified = false; lastVerifiedPhone = '';
+      document.getElementById('phone-verified-msg').style.display = 'none';
+      validateForm();
     } catch(e) {
-      showToast('Failed to send OTP. Try again.');
+      console.error('Firebase OTP error:', e);
+      showToast(e.message || 'Failed to send OTP. Try again.');
       btn.textContent = 'Send OTP';
+      if (window.recaptchaVerifier) { try { window.recaptchaVerifier.clear(); } catch(_) {} window.recaptchaVerifier = null; }
     }
     btn.disabled = false;
   }
@@ -475,28 +510,38 @@
     const phone = document.getElementById('ship-phone').value.trim();
     const otp = document.getElementById('otp-input').value.trim();
     const msg = document.getElementById('otp-msg');
+    const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
     if (!otp || otp.length !== 6) { msg.style.color='#e53935'; msg.textContent='Enter the 6-digit OTP'; return; }
+
+    // Test phone: verify via API
+    if (isTestPhone(digits)) {
+      try {
+        const res = await fetch('/api/verify-phone-otp', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, otp }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          phoneVerified = true; lastVerifiedPhone = phone;
+          document.getElementById('otp-section').style.display = 'none';
+          document.getElementById('phone-verified-msg').style.display = 'block';
+          msg.textContent = ''; validateForm();
+        } else { msg.style.color='#e53935'; msg.textContent = data.error || 'Invalid OTP.'; }
+      } catch(e) { msg.style.color='#e53935'; msg.textContent='Verification failed. Try again.'; }
+      return;
+    }
+
+    // Real number: Firebase confirm
+    if (!window.firebaseConfirmation) { msg.style.color='#e53935'; msg.textContent='Please send OTP first.'; return; }
     try {
-      const res = await fetch('/api/verify-phone-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp }),
-      });
-      const data = await res.json();
-      if (data.ok) {
-        phoneVerified = true;
-        lastVerifiedPhone = phone;
-        document.getElementById('otp-section').style.display = 'none';
-        document.getElementById('phone-verified-msg').style.display = 'block';
-        msg.textContent = '';
-        validateForm();
-      } else {
-        msg.style.color = '#e53935';
-        msg.textContent = data.error || 'Invalid OTP. Try again.';
-      }
+      await window.firebaseConfirmation.confirm(otp);
+      phoneVerified = true; lastVerifiedPhone = phone;
+      document.getElementById('otp-section').style.display = 'none';
+      document.getElementById('phone-verified-msg').style.display = 'block';
+      msg.textContent = ''; validateForm();
     } catch(e) {
       msg.style.color = '#e53935';
-      msg.textContent = 'Verification failed. Try again.';
+      msg.textContent = 'Invalid OTP. Try again.';
     }
   }
 

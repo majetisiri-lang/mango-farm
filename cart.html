@@ -166,7 +166,12 @@
           <div class="co-delivery-opt-price">₹80/kg</div>
         </label>
       </div>
-      <select id="ship-zone" onchange="updateSummary(); validateForm()" style="display:none;"></select>
+      <select id="ship-zone" onchange="updateSummary(); validateForm()" style="display:none;">
+        <option value=""></option>
+        <option value="pickup">pickup</option>
+        <option value="ap">ap</option>
+        <option value="south">south</option>
+      </select>
       <div id="pickup-notice" style="display:none;background:#f0faf4;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#1a5c36;margin-top:10px;">
         🏡 Collect from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge.
       </div>

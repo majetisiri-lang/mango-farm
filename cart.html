@@ -443,14 +443,6 @@
 
   async function sendPhoneOtp() {
     const phone = document.getElementById('ship-phone').value.trim();
-    if (isTestPhone(phone)) {
-      phoneVerified = true;
-      lastVerifiedPhone = phone;
-      document.getElementById('otp-section').style.display = 'none';
-      document.getElementById('phone-verified-msg').style.display = 'block';
-      validateForm();
-      return;
-    }
     const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
     if (!/^[6-9]\d{9}$/.test(digits)) {
       showToast('Please enter a valid Indian mobile number first');
@@ -468,7 +460,7 @@
       if (data.ok) {
         document.getElementById('otp-section').style.display = 'block';
         document.getElementById('otp-msg').style.color = 'var(--green)';
-        document.getElementById('otp-msg').textContent = `OTP sent to ${phone}`;
+        document.getElementById('otp-msg').textContent = data.test ? `Test OTP: 000000` : `OTP sent to ${phone}`;
         btn.textContent = 'Resend OTP';
         phoneVerified = false;
         lastVerifiedPhone = '';

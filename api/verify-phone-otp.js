@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
   const { phone, otp } = req.body;
   if (!phone || !otp) return res.status(400).json({ error: 'Missing fields' });
 
-  const clean = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
+  const clean = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91|\+1|1)/, '');
 
   const redis = new Redis({
     url: process.env.UPSTASH_REDIS_REST_URL,

@@ -63,6 +63,10 @@
   <div class="shop-toolbar" style="margin-bottom: 28px; gap: 12px; flex-wrap: wrap;">
     <input type="text" id="f-search" placeholder="🔍  Search varieties..." oninput="filterProducts()"
       style="flex:1;min-width:200px;border:1px solid #e0e0e0;border-radius:10px;padding:9px 14px;font-size:.9rem;font-family:inherit;background:#fff;">
+    <label style="display:flex;align-items:center;gap:7px;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;">
+      <input type="checkbox" id="f-available" onchange="filterProducts()" style="width:16px;height:16px;accent-color:var(--green);cursor:pointer;">
+      Available only
+    </label>
     <p class="results-count" id="results-count" style="white-space:nowrap;">Showing all products</p>
     <select class="sort-select" onchange="sortProducts(this.value)">
       <option value="default">Sort: Featured</option>
@@ -122,7 +126,12 @@
   function renderShop() {
     const grid = document.getElementById('shop-products');
     const html = categories.map(cat => {
-      const catProducts = displayedProducts.filter(p => p.category === cat.key).sort((a,b) => (b.badge ? 1 : 0) - (a.badge ? 1 : 0));
+      const catProducts = displayedProducts
+        .filter(p => p.category === cat.key)
+        .sort((a, b) => {
+          if (a.soldOut !== b.soldOut) return a.soldOut ? 1 : -1;
+          return (b.badge ? 1 : 0) - (a.badge ? 1 : 0);
+        });
       if (!catProducts.length) return '';
       return `<div class="category-section">
         <h2 class="category-heading">${cat.label}</h2>
@@ -136,8 +145,10 @@
 
   function filterProducts() {
     const search = document.getElementById('f-search').value.toLowerCase();
+    const availableOnly = document.getElementById('f-available').checked;
     displayedProducts = products.filter(p =>
-      (!search || p.name.toLowerCase().includes(search))
+      (!search || p.name.toLowerCase().includes(search)) &&
+      (!availableOnly || !p.soldOut)
     );
     renderShop();
   }

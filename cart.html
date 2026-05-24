@@ -460,35 +460,16 @@
     const btn = document.getElementById('otp-send-btn');
     btn.disabled = true; btn.textContent = 'Sending...';
 
-    // Test phone: use server-side fixed OTP
-    if (isTestPhone(digits)) {
-      try {
-        const res = await fetch('/api/send-phone-otp', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone }),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          document.getElementById('otp-section').style.display = 'block';
-          document.getElementById('otp-msg').style.color = 'var(--green)';
-          document.getElementById('otp-msg').textContent = `Test OTP: ${data.testOtp}`;
-          btn.textContent = 'Resend OTP';
-          phoneVerified = false; lastVerifiedPhone = '';
-          document.getElementById('phone-verified-msg').style.display = 'none';
-          validateForm();
-        } else { showToast(data.error || 'Failed'); btn.textContent = 'Send OTP'; }
-      } catch(e) { showToast('Failed. Try again.'); btn.textContent = 'Send OTP'; }
-      btn.disabled = false;
-      return;
-    }
+    // Format phone number — US for test numbers, +91 for Indian
+    const formattedPhone = isTestPhone(digits) ? '+1' + digits : '+91' + digits;
 
-    // Real number: Firebase Phone Auth
+    // Firebase Phone Auth for all numbers
     try {
       if (window.recaptchaVerifier) {
         try { window.recaptchaVerifier.clear(); } catch(e) {}
       }
       window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('otp-send-btn', { size: 'invisible' });
-      const confirmation = await firebase.auth().signInWithPhoneNumber('+91' + digits, window.recaptchaVerifier);
+      const confirmation = await firebase.auth().signInWithPhoneNumber(formattedPhone, window.recaptchaVerifier);
       window.firebaseConfirmation = confirmation;
       document.getElementById('otp-section').style.display = 'block';
       document.getElementById('otp-msg').style.color = 'var(--green)';
@@ -513,25 +494,7 @@
     const digits = phone.replace(/[\s\-\+]/g, '').replace(/^(\+91|91)/, '');
     if (!otp || otp.length !== 6) { msg.style.color='#e53935'; msg.textContent='Enter the 6-digit OTP'; return; }
 
-    // Test phone: verify via API
-    if (isTestPhone(digits)) {
-      try {
-        const res = await fetch('/api/verify-phone-otp', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, otp }),
-        });
-        const data = await res.json();
-        if (data.ok) {
-          phoneVerified = true; lastVerifiedPhone = phone;
-          document.getElementById('otp-section').style.display = 'none';
-          document.getElementById('phone-verified-msg').style.display = 'block';
-          msg.textContent = ''; validateForm();
-        } else { msg.style.color='#e53935'; msg.textContent = data.error || 'Invalid OTP.'; }
-      } catch(e) { msg.style.color='#e53935'; msg.textContent='Verification failed. Try again.'; }
-      return;
-    }
-
-    // Real number: Firebase confirm
+    // Firebase confirm for all numbers
     if (!window.firebaseConfirmation) { msg.style.color='#e53935'; msg.textContent='Please send OTP first.'; return; }
     try {
       await window.firebaseConfirmation.confirm(otp);
@@ -559,7 +522,7 @@
     const err = document.getElementById('phone-error');
     if (!phone) { err.style.display = 'none'; return; }
     const digits = phone.replace(/[\s\-\+]/g, '');
-    const valid = /^(\+91|91)?[6-9]\d{9}$/.test(digits) || /^[6-9]\d{9}$/.test(digits);
+    const valid = isTestPhone(digits) || /^(\+91|91)?[6-9]\d{9}$/.test(digits) || /^[6-9]\d{9}$/.test(digits);
     err.style.display = valid ? 'none' : 'block';
     if (phone !== lastVerifiedPhone) {
       phoneVerified = false;
@@ -677,7 +640,7 @@
       deliveryCard.style.display = (address && city && state) ? '' : 'none';
     }
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
-    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
+    const phoneValid = isTestPhone(phoneDigits) || /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
     const pinValid = TEST_PINS.includes(zip) || (/^\d{6}$/.test(zip) && parseInt(zip[0]) >= 1 && parseInt(zip[0]) <= 8);
     const cityNonIndian = city && (/,|[A-Z]{2}\s*\d{5}/.test(city) || /\b(TX|CA|NY|FL|IL|PA|OH|GA|NC|MI|NJ|VA|WA|AZ|MA|TN|IN|MO|MD|WI|CO|MN|SC|AL|LA|KY|OR|OK|CT|UT|IA|NV|AR|MS|KS|NM|NE|WV|ID|HI|NH|ME|RI|MT|DE|SD|ND|AK|VT|WY|DC)\b/.test(city.toUpperCase()));
     const isContactOnly = zone === 'pickup' || zone === 'anl';
@@ -796,7 +759,7 @@
       if (!TEST_PINS.includes(zip) && !/^\d{6}$/.test(zip)) { showToast('Please enter a valid 6-digit PIN code'); return; }
     }
     const phoneDigits = phone.replace(/[\s\-\+]/g, '');
-    const phoneValid = /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
+    const phoneValid = isTestPhone(phoneDigits) || /^(\+91|91)?[6-9]\d{9}$/.test(phoneDigits) || /^[6-9]\d{9}$/.test(phoneDigits);
     if (!phone) { showToast('Please enter your phone number'); return; }
     if (!phoneValid) { showToast('Please enter a valid 10-digit Indian mobile number'); return; }
     if (!phoneVerified || lastVerifiedPhone !== phone) { showToast('Please verify your phone number with OTP first'); return; }

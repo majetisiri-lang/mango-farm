@@ -78,7 +78,6 @@
       </div>
       <div class="summary-row"><span>Subtotal</span><span id="sum-subtotal">₹0</span></div>
       <div class="summary-row"><span>Shipping</span><span id="sum-delivery">—</span></div>
-      <div class="summary-row"><span id="express-label" style="display:none;">Express</span><span id="sum-express" style="display:none;"></span></div>
       <div class="summary-row" id="discount-row" style="display:none;color:var(--green);font-weight:600;"><span id="discount-label">Discount</span><span id="sum-discount"></span></div>
       <div class="summary-row total"><span>Total</span><span id="sum-total">₹0</span></div>
 
@@ -162,10 +161,6 @@
       </div>
       <div id="pickup-notice" style="display:none;background:#f0faf4;border:1px solid #b2dfcb;border-radius:10px;padding:10px 14px;font-size:.85rem;color:#1a5c36;margin-bottom:4px;">
         🏡 You've selected farm pickup. Collect your order from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge applies.
-      </div>
-      <div class="form-group" id="express-row" style="display:flex;align-items:center;gap:10px;">
-        <input type="checkbox" id="express-shipping" onchange="updateSummary(); validateForm()" style="width:18px;height:18px;accent-color:var(--green);flex-shrink:0;">
-        <label for="express-shipping" style="font-size:.9rem;cursor:pointer;margin:0;">Add Express Shipping <span style="color:var(--green);font-weight:700;">+₹125</span></label>
       </div>
       <div id="shipping-breakdown" style="background:#f9f5eb;border-radius:8px;padding:10px 14px;font-size:.82rem;color:#666;margin-bottom:4px;display:none;"></div>
 
@@ -312,11 +307,9 @@
     }, 0);
 
     const zone = document.getElementById('ship-zone').value;
-    const express = document.getElementById('express-shipping').checked;
     const shipping = calcShipping(zone, totalKg);
-    const expressCharge = express ? 125 : 0;
     const discountAmt = Math.round(subtotal * appliedDiscount / 100);
-    const total = adminOverride ? 1 : subtotal - discountAmt + shipping + expressCharge;
+    const total = adminOverride ? 1 : subtotal - discountAmt + shipping;
 
     document.getElementById('sum-subtotal').textContent = `₹${subtotal}`;
     document.getElementById('sum-delivery').textContent = zone ? `₹${shipping}` : '— select zone';
@@ -330,21 +323,10 @@
       discountRow.style.display = 'none';
     }
 
-    const expressLabel = document.getElementById('express-label');
-    const expressEl = document.getElementById('sum-express');
-    if (express) {
-      expressLabel.style.display = ''; expressEl.style.display = '';
-      expressEl.textContent = `₹125`;
-    } else {
-      expressLabel.style.display = 'none'; expressEl.style.display = 'none';
-    }
-
     document.getElementById('sum-total').textContent = zone ? `₹${total}` : '—';
 
     const isPickup = zone === 'pickup';
     document.getElementById('pickup-notice').style.display = isPickup ? 'block' : 'none';
-    document.getElementById('express-row').style.display = isPickup ? 'none' : 'flex';
-    if (isPickup) document.getElementById('express-shipping').checked = false;
 
     const breakdown = document.getElementById('shipping-breakdown');
     if (zone && !isPickup) {
@@ -599,12 +581,10 @@
       return sum + (p ? p.price * item.qty : 0);
     }, 0);
     const zone = document.getElementById('ship-zone').value;
-    const express = document.getElementById('express-shipping').checked;
     const totalKg = getTotalKg(cart);
     const shipping = calcShipping(zone, totalKg);
-    const expressCharge = express ? 125 : 0;
     const discountAmt = Math.round(subtotal * appliedDiscount / 100);
-    return adminOverride ? 1 : subtotal - discountAmt + shipping + expressCharge;
+    return adminOverride ? 1 : subtotal - discountAmt + shipping;
   }
 
   async function showOrderSuccess(paymentId) {

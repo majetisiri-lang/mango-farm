@@ -127,7 +127,7 @@ function renderProductCard(product) {
       </div>
       <div class="product-body">
         <div class="product-name">${product.name}</div>
-        ${qty > 0 && !product.soldOut ? `<div class="product-price" style="margin-bottom:8px;">₹${product.price} <span>/ ${product.size}</span></div>` : ''}
+        ${qty > 0 && !product.soldOut ? `<div class="product-price" style="margin-bottom:2px;">₹${product.price} <span>/ ${product.size}</span></div><div style="font-size:.72rem;color:#888;margin-bottom:8px;">per kg · excl. shipping</div>` : ''}
         <div class="product-footer">${footer}</div>
       </div>
     </div>`;

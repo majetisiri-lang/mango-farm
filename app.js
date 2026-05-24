@@ -42,7 +42,7 @@ function addToCart(productId) {
   updateCartCount();
   if (typeof window.refreshProductCards === 'function') window.refreshProductCards();
   const product = products.find(p => p.id === productId);
-  showToast(`🥭 ${product.name} added to cart!`);
+  showToastWithLink(`🥭 ${product.name} added!`, 'Go to Cart →', 'cart.html');
 }
 
 function updateCartCount() {
@@ -180,4 +180,12 @@ function showToast(message) {
   toast.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+}
+function showToastWithLink(message, linkText, linkHref) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.innerHTML = `${message} <a href="${linkHref}" style="color:#fff;font-weight:700;text-decoration:underline;margin-left:8px;">${linkText}</a>`;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 3500);
 }

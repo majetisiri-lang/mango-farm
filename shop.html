@@ -112,16 +112,6 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- STICKY CART BAR -->
-<div id="sticky-cart-bar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#1a5c36;color:#fff;z-index:200;padding:14px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 16px rgba(0,0,0,.15);">
-  <div>
-    <div style="font-size:.82rem;opacity:.8;">Your cart</div>
-    <div id="sticky-cart-summary" style="font-weight:700;font-size:1rem;"></div>
-  </div>
-  <a href="cart.html" class="btn" style="background:#fff;color:#1a5c36;font-weight:800;padding:10px 22px;border-radius:10px;white-space:nowrap;font-size:.95rem;">
-    Checkout →
-  </a>
-</div>
 
 <script src="app.js"></script>
 <script>
@@ -177,26 +167,8 @@
     renderShop();
   }
 
-  function updateStickyBar() {
-    const cart = getCart();
-    const bar = document.getElementById('sticky-cart-bar');
-    const summary = document.getElementById('sticky-cart-summary');
-    const totalKg = getTotalKg(cart);
-    const totalPrice = cart.reduce((sum, i) => {
-      const p = products.find(p => p.id === i.id);
-      return sum + (p ? p.price * i.qty : 0);
-    }, 0);
-    if (totalKg > 0) {
-      summary.textContent = `${totalKg} kg · ₹${totalPrice}`;
-      bar.style.display = 'flex';
-    } else {
-      bar.style.display = 'none';
-    }
-  }
-
-  window.refreshProductCards = () => { renderShop(); updateStickyBar(); };
+window.refreshProductCards = renderShop;
   renderShop();
-  updateStickyBar();
   updateCartCount(); initNav();
 </script>
 </body>

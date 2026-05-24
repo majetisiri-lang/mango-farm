@@ -113,7 +113,7 @@ function renderProductCard(product) {
             ? `<div class="product-sold-out">Sold Out</div>`
             : `<div>
               <div class="product-price">₹${product.price} <span>/ ${product.size}</span></div>
-              <div style="font-size:.72rem;color:#888;margin-top:2px;">Min. 5 kg</div>
+              <div style="font-size:.72rem;color:#888;margin-top:2px;">Min. 5 kg · Shipping price varies</div>
             </div>
           <button class="add-to-cart" onclick="addToCart(${product.id})" title="Add to cart">+</button>`}
         </div>

@@ -73,18 +73,6 @@
       <label>Full Name</label>
       <input type="text" id="ship-name" placeholder="Your full name" oninput="validateForm()">
     </div>
-    <div class="form-group">
-      <label>Delivery Method</label>
-      <select id="ship-zone" onchange="updateSummary(); validateForm()">
-        <option value="">Select delivery method...</option>
-        <option value="pickup">Pickup from Farm (Free) — Narsapur, Andhra Pradesh</option>
-        <option value="ap">Andhra Pradesh — ₹60/kg</option>
-        <option value="south">South India (TN, KA, TG, KL) — ₹80/kg</option>
-      </select>
-    </div>
-    <div id="pickup-notice" style="display:none;background:#f0faf4;border:1px solid #b2dfcb;border-radius:10px;padding:10px 14px;font-size:.85rem;color:#1a5c36;margin-bottom:4px;">
-      🏡 You've selected farm pickup. Collect your order from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge applies.
-    </div>
     <div id="address-fields">
       <div class="form-group">
         <label>Street Address</label>
@@ -138,7 +126,21 @@
       </div>
       <div id="phone-verified-msg" style="color:var(--green);font-size:.78rem;margin-top:4px;display:none;">✓ Phone number verified</div>
     </div>
-    <div id="shipping-breakdown" style="background:#f9f5eb;border-radius:10px;padding:10px 14px;font-size:.82rem;color:#666;margin-top:4px;display:none;"></div>
+
+    <!-- DELIVERY METHOD — highlighted -->
+    <div class="delivery-method-box">
+      <div class="delivery-method-label">🚚 Delivery Method</div>
+      <select id="ship-zone" onchange="updateSummary(); validateForm()">
+        <option value="">Select delivery method...</option>
+        <option value="pickup">Pickup from Farm (Free) — Narsapur, Andhra Pradesh</option>
+        <option value="ap">Andhra Pradesh — ₹60/kg</option>
+        <option value="south">South India (TN, KA, TG, KL) — ₹80/kg</option>
+      </select>
+      <div id="pickup-notice" style="display:none;background:#d6f5e3;border-radius:8px;padding:8px 12px;font-size:.82rem;color:#1a5c36;margin-top:8px;">
+        🏡 Collect from our farm in <strong>Narsapur, Andhra Pradesh</strong>. No shipping charge.
+      </div>
+      <div id="shipping-breakdown" style="font-size:.82rem;color:#1a5c36;margin-top:8px;display:none;"></div>
+    </div>
   </div>
 
   <!-- ORDER SUMMARY -->

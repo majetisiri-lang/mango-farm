@@ -26,6 +26,10 @@ module.exports = async (req, res) => {
   // Send email notification
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
+    const ZONE_LABELS = { ap: 'Andhra Pradesh — Door Delivery (DTDC)', south: 'South India — Door Delivery (DTDC)', pickup: 'Farm Pickup (Narsapur)', anl: 'Cheaper Option — ANL/Navitha Branch Pickup' };
+    const zoneLabel = ZONE_LABELS[order.zone] || order.zone || '—';
+    const shippingLine = order.shipping > 0 ? `₹${order.shipping} (₹${Math.round(order.shipping / (order.totalKg || 1))}/kg × ${order.totalKg} kg)` : 'Free';
+
     const itemsHtml = (order.items || [])
       .map(i => `<tr><td style="padding:6px 12px">${i.name}</td><td style="padding:6px 12px">${i.qty} kg</td><td style="padding:6px 12px">₹${i.price * i.qty}</td></tr>`)
       .join('');
@@ -43,8 +47,7 @@ module.exports = async (req, res) => {
           <p>
             <strong>Name:</strong> ${order.name || '—'}<br>
             <strong>Phone:</strong> ${order.phone || '—'}<br>
-            <strong>Address:</strong> ${order.address || '—'}, ${order.city || '—'} — ${order.zip || '—'}<br>
-            <strong>Zone:</strong> ${order.zone || '—'}
+            <strong>Address:</strong> ${order.address || '—'}, ${order.city || '—'} — ${order.zip || '—'}
           </p>
 
           <h3 style="margin-top:24px">Order Items</h3>
@@ -59,7 +62,13 @@ module.exports = async (req, res) => {
             <tbody>${itemsHtml}</tbody>
           </table>
 
-          <p style="margin-top:16px;font-size:1.1rem"><strong>Total: ₹${order.total}</strong></p>
+          <h3 style="margin-top:24px">Pricing</h3>
+          <p>
+            <strong>Subtotal:</strong> ₹${order.subtotal || '—'}<br>
+            <strong>Delivery:</strong> ${zoneLabel}<br>
+            <strong>Shipping:</strong> ${shippingLine}<br>
+            <strong style="font-size:1.1rem">Total: ₹${order.total}</strong>
+          </p>
         </div>
       `,
     });

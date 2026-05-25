@@ -716,9 +716,17 @@
       const p = products.find(p => p.id === item.id);
       return { name: p.name, qty: item.qty, price: p.price };
     });
+    const zone = document.getElementById('ship-zone').value;
+    const totalKg = getTotalKg(cart);
+    const shipping = calcShipping(zone, totalKg);
+    const subtotal = cart.reduce((s, i) => { const p = products.find(p => p.id === i.id); return s + (p ? p.price * i.qty : 0); }, 0);
     const order = {
       orderNum,
       total: getOrderTotal(),
+      subtotal,
+      shipping,
+      zone,
+      totalKg,
       items,
       paymentId: paymentId || 'COD',
       name: document.getElementById('ship-name').value.trim(),
@@ -726,7 +734,6 @@
       city: document.getElementById('ship-city').value.trim(),
       zip: document.getElementById('ship-zip').value.trim(),
       phone: document.getElementById('ship-phone').value.trim(),
-      zone: document.getElementById('ship-zone').value,
       status: 'Confirmed',
     };
     const token = localStorage.getItem('mgf_token');
